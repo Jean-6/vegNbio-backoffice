@@ -1,0 +1,27 @@
+body,html{
+  height:100%;
+  margin:0;
+  font-family: arial,sans-serif;
+}
+
+
+.btn-outline-light{
+  border-color: white;
+  color: white;
+}
+
+.btn-outline-light:hover{
+  background-color: white;
+  color: #000;
+}
+
+.payment-icons img:hover{
+  transform: scale(1.1);
+}
+
+@media (max-width: 760px) {
+  .left-section{
+    text-align: center;
+    padding: 2rem;
+  }
+}

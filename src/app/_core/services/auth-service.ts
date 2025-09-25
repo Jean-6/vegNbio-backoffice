@@ -5,6 +5,7 @@ import {LoginRequest} from '../dto/loginRequest';
 import {LoginResponse} from '../dto/loginResponse';
 import {ResponseWrapper} from '../dto/responseWrapper';
 import {environment} from '../../../environments/environment';
+import {ERole} from '../models/ERole';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,11 @@ export class AuthService {
   private isAuthenticated = new BehaviorSubject<boolean>(false);
 
   constructor(private _httpClient: HttpClient) {
+    const savedUser = localStorage.getItem('currentUser');
+    if(savedUser){
+      this.currentUser.next(JSON.parse(savedUser));
+      this.isAuthenticated.next(true);
+    }
   }
 
 
@@ -33,9 +39,34 @@ export class AuthService {
     return this.isAuthenticated.asObservable();
   }
 
-  setCurrentUser(user : {username: string, roles: ERole[]} | null ): void {
-    this.currentUser.next(user);
-    //localStorage.setItem('currentUser', JSON.stringify(user));
+  setCurrentUser(user : {username: string, roles: any[]}  | null): void{
+
+    if(!user){
+      this.currentUser.next(null);
+      localStorage.removeItem('currentUser');
+      return;
+    }
+
+    const mappedRoles: ERole[] = (user.roles || [])
+      .map(r => {
+        switch (r.role) {
+          case 'ADMIN': return ERole.ADMIN;
+          case 'CUSTOMER': return ERole.CUSTOMER;
+          case 'RESTORER': return ERole.RESTORER;
+          case 'SUPPLIER': return ERole.SUPPLIER;
+          default: return null;
+        }
+      })
+      .filter((r): r is ERole => r !== null);
+
+    const safeUser = {
+      username: user.username,
+      roles: mappedRoles
+    }
+    this.currentUser.next(safeUser);
+
+    // persistance locale (optionnel mais recommandé)
+    localStorage.setItem("currentUser", JSON.stringify(safeUser));
   }
 
   setIsAuthenticated(value: boolean): void {
@@ -71,11 +102,12 @@ export class AuthService {
           .map(r => r.role)
           .filter((role): role is ERole => role !== undefined);
 
-        this.setIsAuthenticated(true);
+
         this.setCurrentUser({
           username: response.data.username ?? '' ,
           roles: roles
         })
+        this.setIsAuthenticated(true);
 
       }),
       map(response => response.data),
