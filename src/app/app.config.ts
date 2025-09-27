@@ -7,9 +7,11 @@ import Aura from '@primeuix/themes/aura';
 import {MessageService} from 'primeng/api';
 import {provideHttpClient} from '@angular/common/http';
 import {ToastModule} from 'primeng/toast';
+import {provideAnimations} from '@angular/platform-browser/animations';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideAnimations(),
     provideHttpClient(),
     MessageService,
     ToastModule,
