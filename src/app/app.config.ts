@@ -8,10 +8,12 @@ import {MessageService} from 'primeng/api';
 import {provideHttpClient} from '@angular/common/http';
 import {ToastModule} from 'primeng/toast';
 import {provideAnimations} from '@angular/platform-browser/animations';
+import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideAnimations(),
+    provideAnimationsAsync(),
     provideHttpClient(),
     MessageService,
     ToastModule,
