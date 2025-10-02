@@ -9,6 +9,11 @@ import {provideHttpClient} from '@angular/common/http';
 import {ToastModule} from 'primeng/toast';
 import {provideAnimations} from '@angular/platform-browser/animations';
 import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
+import {registerLocaleData} from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
+
+registerLocaleData(localeFr, 'fr');
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
