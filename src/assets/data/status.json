@@ -1,0 +1,5 @@
+[
+  { "label": "En attente", "value": "PENDING" },
+  { "label": "Validé", "value": "APPROVED" },
+  { "label": "Réjeté", "value": "REJECTED" }
+]

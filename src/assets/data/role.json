@@ -1,0 +1,6 @@
+[
+  { "label": "Administrateur", "value": "ADMIN" },
+  { "label": "Restaurateur", "value": "RESTORER" },
+  { "label": "Fournisseur", "value": "SUPPLIER" },
+  { "label": "Client", "value": "CUSTOMER" }
+]
