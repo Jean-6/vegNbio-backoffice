@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <title>Aside Menu Layout</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+
+  </style>
+</head>
+<body>
+
+
+<div class="container-fluid">
+  <div class="row flex-nowrap ">
+    <!-- SideMenu -->
+    <nav class="col-12 col-xs-3 col-md-3 col-xl-2 px-0 bg-dark text-white sidebar">
+      <app-admin-aside-menu/>
+    </nav>
+
+    <main class="col">
+
+      <div class="container-fluid">
+        <app-navbar-top></app-navbar-top>
+      </div>
+
+
+      <p-stepper [(value)]="activeStep" class="basis-[40rem]">
+
+        <p-step-list>
+          <p-step [value]="1">Informations</p-step>
+          <p-step [value]="2">Dates et horaires</p-step>
+          <p-step [value]="3">Lieu</p-step>
+          <p-step [value]="4">Médias</p-step>
+          <p-step [value]="5"></p-step>
+        </p-step-list>
+
+
+        <p-step-panels class="w-full">
+          <!-- Étape 1 : Informations générales -->
+          <p-step-panel [value]="1">
+            <ng-template #content let-activateCallback="activateCallback">
+              <div class="max-w-lg mx-auto min-h-[50rem] flex flex-col"
+                   pAnimateOnScroll enterClass="animate-enter fade-in-10 zoom-in-75 animate-duration-1000">
+                <h3 class="text-left text-2xl fw-bold text-primary mt-2 mb-4">📌 Informations générales</h3>
+
+                <form [formGroup]="infoForm" class="">
+                  <div class="row py-3">
+                    <div class="col-md">
+                      <label class="fw-bold">Type d'événement*</label>
+                      <p-multiSelect [maxSelectedLabels]="1" [options]="eventParams" appendTo="body"
+                                     class="form-label mb-0 w-100 mb-3"
+                                     formControlName="type" optionLabel="label"
+                                     optionValue="value" placeholder="Sélectionner le type">
+
+                      </p-multiSelect>
+                    </div>
+
+                    <div class="col-md">
+                      <label class="fw-bold">Nom de l'événement*</label>
+                      <input class="form-label mb-0 w-100 mb-3" formControlName="title" pInputText type="text"/>
+                    </div>
+                  </div>
+
+                  <div class="row py-3">
+                    <div class="col-md">
+                      <label class="fw-bold">Description*</label>
+                      <textarea class="form-label mb-0 w-100 mb-3" cols="65" formControlName="desc" pTextarea
+                                rows="3"></textarea>
+                    </div>
+                  </div>
+                </form>
+                <!-- Barre de navigation -->
+                <div class="flex justify-end pt-6 mt-auto">
+                  <p-button (onClick)="activateCallback(2)" icon="pi pi-arrow-right" iconPos="right" label="Suivant"/>
+                </div>
+              </div>
+            </ng-template>
+          </p-step-panel>
+
+          <!-- Étape 2 : Dates & horaires -->
+          <p-step-panel [value]="2">
+            <ng-template #content let-activateCallback="activateCallback">
+              <div class="max-w-xl mx-auto min-h-[30rem] flex flex-col">
+
+                <!-- Contenu qui prend la place -->
+                <div class="flex-grow">
+                  <h3 class="text-left text-2xl fw-bold text-primary mt-4">
+                    🗓️ Dates & Horaires
+                  </h3>
+
+                  <form [formGroup]="dateForm" class="mt-6 space-y-4">
+
+                    <div class="row py-3">
+                      <label class="form-label fw-bold mb-1">Date*</label>
+                      <div class="col-md">
+
+                        <p-datepicker [showIcon]="true" appendTo="body"
+                                      formControlName="date"
+                                      placeholder="Choisir une date"></p-datepicker>
+                      </div>
+                    </div>
+
+                    <div class="row d-flex py-3 ">
+                      <div class="col-md">
+                      <label class="form-label fw-bold mb-1">Heure de début* </label>
+                        <div>
+                          <p-datepicker [timeOnly]="true" appendTo="body" class="w-full"
+                                        formControlName="startTime"></p-datepicker>
+                        </div>
+                      </div>
+
+                      <div class="col-md">
+                        <label class="form-label mb-1 fw-bold">Heure de début*</label>
+                        <div>
+                          <p-datepicker [timeOnly]="true" appendTo="body" class="w-full"
+                                        formControlName="endTime"></p-datepicker>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- Navigation en bas avec un vrai espace -->
+                <div class="flex justify-between pt-8 mt-5 border-t border-gray-200">
+                  <p-button (onClick)="activateCallback(1)"
+                            icon="pi pi-arrow-left"
+                            label="Retour"
+                            severity="secondary" />
+                  <p-button (onClick)="activateCallback(3)"
+                            icon="pi pi-arrow-right"
+                            iconPos="right"
+                            label="Suivant" class="mx-4"/>
+                </div>
+              </div>
+            </ng-template>
+          </p-step-panel>
+
+          <!-- Étape 3 : Lieu -->
+          <p-step-panel [value]="3">
+            <ng-template #content let-activateCallback="activateCallback">
+              <div class="max-w-xl mx-auto min-h-[40rem] flex flex-col justify-between">
+                <h3 class="text-left text-2xl fw-bold text-primary mt-4">📍 Lieu</h3>
+
+                <form [formGroup]="locationForm" class="flex flex-col gap-4">
+                  <div class="row gap-2">
+                    <label class="fw-bold">Restaurant*</label>
+                    <div class="col-md">
+
+                      <p-autocomplete
+                        [dropdown]="true"
+                        [suggestions]="canteenParams"
+                        (completeMethod)="search($event)"
+                        formControlName="location"
+                        optionLabel="name"
+                        optionValue="id"
+                        appendTo="body"
+                        class="w-full"
+                      ></p-autocomplete>
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+              <div class="flex justify-between pt-6 mt-5 border-t border-gray-200">
+                <p-button (onClick)="activateCallback(2)" icon="pi pi-arrow-left" label="Retour" severity="secondary"/>
+                <p-button (onClick)="activateCallback(4)" icon="pi pi-arrow-right" iconPos="right" label="Suivant" class="mx-4"/>
+              </div>
+            </ng-template>
+          </p-step-panel>
+
+          <!-- Étape 4 : Médias -->
+          <p-step-panel [value]="4">
+            <ng-template #content let-activateCallback="activateCallback">
+              <div class="max-w-xl mx-auto min-h-[30rem] flex flex-col">
+                <h3 class="text-left text-2xl fw-bold text-primary mt-4">🖼️ Médias</h3>
+
+                <form [formGroup]="mediaForm" class="flex flex-col gap-4">
+                  <p-fileupload
+                    (onSelect)="onSelect($event)"
+                    (onUpload)="onUpload($event)"
+                    [multiple]="true"
+                    accept="image/*"
+                    cancelLabel="Annuler"
+                    chooseLabel="Choisir"
+                    class="w-full"
+                    maxFileSize="1000000"
+                    mode="advanced"
+                    uploadLabel="Uploader"
+                  >
+                    <ng-template #empty>
+                      <div class="text-gray-400">Glissez-déposez vos images ici</div>
+                    </ng-template>
+                  </p-fileupload>
+                </form>
+              </div>
+
+
+              <div class="flex justify-between  mt-5 border-t border-gray-200 ">
+                  <p-button (onClick)="activateCallback(3)" icon="pi pi-arrow-left" label="Retour" severity="secondary" />
+                  <p-button (onClick)="activateCallback(5)" icon="pi pi-check" label="Finaliser" class="mx-4"/>
+                </div>
+
+
+            </ng-template>
+          </p-step-panel>
+
+          <!-- Étape 5 : Confirmation -->
+          <p-step-panel [value]="5">
+            <ng-template #content let-activateCallback="activateCallback">
+              <div class="max-w-md mx-auto min-h-[18rem] flex flex-col items-center justify-center gap-6">
+                <h3 class="text-2xl font-bold text-green-600">✅ Événement créé avec succès</h3>
+                <img alt="confirmation" class="w-40"
+                     src="https://primefaces.org/cdn/primeng/images/stepper/content.svg"/>
+              </div>
+
+              <div class="flex justify-center pt-6">
+                <p-button (onClick)="activateCallback(1)" icon="pi pi-plus" label="Créer un nouvel événement"
+                          severity="primary"/>
+              </div>
+            </ng-template>
+          </p-step-panel>
+        </p-step-panels>
+
+      </p-stepper>
+
+      <!---->
+
+    </main>
+  </div>
+</div>
+</body>
+
+</html>
