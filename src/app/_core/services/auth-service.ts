@@ -5,7 +5,7 @@ import {LoginRequest} from '../dto/loginRequest';
 import {LoginResponse} from '../dto/loginResponse';
 import {ResponseWrapper} from '../dto/responseWrapper';
 import {environment} from '../../../environments/environment';
-import {ERole} from '../models/ERole';
+import {ERole} from '../models/eRole';
 
 @Injectable({
   providedIn: 'root'
@@ -18,67 +18,43 @@ export class AuthService {
   private logout_ = "/auth/logout";
   private apiUrlRefreshToken = "/auth/refresh-token";
   isLoading = false;
-  private currentUser = new BehaviorSubject<{username: string, roles: ERole[]} | null>(null); //To stock user connected state
-  private isAuthenticated = new BehaviorSubject<boolean>(false);
+  private currentUser$ = new BehaviorSubject<{id: string, username: string, roles: ERole[]} | null>(null); //To stock user connected state
+  private isAuthenticated$ = new BehaviorSubject<boolean>(false);
 
   constructor(private _httpClient: HttpClient) {
-    const savedUser = localStorage.getItem('currentUser');
-    if(savedUser){
-      this.currentUser.next(JSON.parse(savedUser));
-      this.isAuthenticated.next(true);
+    const stored = localStorage.getItem('currentUser');
+    if(stored){
+      const user = JSON.parse(stored);
+      user.roles = user.roles?.map((r: any) => r.toString()) ?? [];
+      this.currentUser$.next(user);
+      this.isAuthenticated$.next(true);
     }
   }
 
 
-  getCurrentUser(): Observable<{ username: string, roles: ERole[] } | null>{
-    return this.currentUser.asObservable();
+  getCurrentUser(): Observable<{ id: string,username: string, roles: ERole[] } | null>{
+    return this.currentUser$.asObservable();
   }
 
 
   getIsAuthenticated(): Observable<boolean> {
-    return this.isAuthenticated.asObservable();
+    return this.isAuthenticated$.asObservable();
   }
 
-  setCurrentUser(user : {username: string, roles: any[]}  | null): void{
-
-    if(!user){
-      this.currentUser.next(null);
-      localStorage.removeItem('currentUser');
-      return;
-    }
-
-    const mappedRoles: ERole[] = (user.roles || [])
-      .map(r => {
-        switch (r.role) {
-          case 'ADMIN': return ERole.ADMIN;
-          case 'CUSTOMER': return ERole.CUSTOMER;
-          case 'RESTORER': return ERole.RESTORER;
-          case 'SUPPLIER': return ERole.SUPPLIER;
-          default: return null;
-        }
-      })
-      .filter((r): r is ERole => r !== null);
-
-    const safeUser = {
-      username: user.username,
-      roles: mappedRoles
-    }
-    this.currentUser.next(safeUser);
-
-    // persistance locale (optionnel mais recommandé)
-    localStorage.setItem("currentUser", JSON.stringify(safeUser));
+  setCurrentUser(user : {id: string,username: string, roles: any[]}  | null): void{
+    this.currentUser$.next(user);
   }
 
   setIsAuthenticated(value: boolean): void {
-    this.isAuthenticated.next(value);
+    this.isAuthenticated$.next(value);
   }
 
   isAdmin(): boolean{
-    return this.currentUser.value?.roles.includes(ERole.ADMIN) ?? false ;
+    return this.currentUser$.value?.roles.includes(ERole.ADMIN) ?? false ;
   }
 
-  /*getUserRoles(): string[] {
-    const user = this.currentUser.value ?? JSON.parse (localStorage.getItem('currentUser') || 'null');
+  getUserRoles(): string[] {
+    const user = this.currentUser$.value ?? JSON.parse (localStorage.getItem('currentUser') || 'null');
     return user?.roles ?? [];
   }
   getAccessToken(): string | null {
@@ -86,39 +62,46 @@ export class AuthService {
   }
   getRefreshToken(): string | null {
     return localStorage.getItem("refreshToken");
-  }*/
+  }
+
+  getUserId(): string {
+    const user = this.currentUser$.value ?? JSON.parse(localStorage.getItem('currentUser') || 'null');
+    return user?.id ? user.id.toString() : '';
+  }
 
 
   login(loginRequest: LoginRequest): Observable<LoginResponse> {
-    return this._httpClient.post<ResponseWrapper<LoginResponse>>(`${environment.apiUrl}${this.urlLogin_}`,
+    return this._httpClient.post<ResponseWrapper<LoginResponse>>(
+      `${environment.apiUrl}${this.urlLogin_}`,
       loginRequest,
-      {withCredentials: true}).pipe(
+      {withCredentials: true}
+    ).pipe(
       tap((response: ResponseWrapper<LoginResponse>) => {
-        if (response.data.accessToken != null) {
+        if (response.data.accessToken) {
           localStorage.setItem('accessToken', response.data.accessToken);
         }
 
         const roles: ERole[] = (response.data.roles ?? [])
           .map(r => r.role)
-          .filter((role): role is ERole => role !== undefined);
+          .filter((role) => !!role );
 
-
-        this.setCurrentUser({
-          username: response.data.username ?? '' ,
+        const user = {
+          id: response.data.id?.toString() ?? '' ,
+          username: response.data.username ?? '',
           roles: roles
-        })
-        this.setIsAuthenticated(true);
+        };
 
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        this.setCurrentUser(user);
+        this.setIsAuthenticated(true);
       }),
       map(response => response.data),
       catchError(err => {
-        console.error(`Error when login : ${err}`)
-        this.setIsAuthenticated(false)
+        console.error(`Error when login : ${err}`);
+        this.setIsAuthenticated(false);
         this.setCurrentUser(null);
-        return throwError(()=> new Error('Error when login'));
-
+        return throwError(() => new Error('Error when login'));
       })
     );
   }
-
 }
