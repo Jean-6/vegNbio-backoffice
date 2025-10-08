@@ -1,0 +1,11 @@
+
+
+[
+  {"label":"Légumes", "value": "Vegetable"},
+  {"label":"Fruits", "value": "Fruit"},
+  {"label":"Boissons", "value": "Beverage"},
+  {"label":"Snack", "value": "Snacks"},
+  {"label":"Plat", "value": "Ready meals"},
+  {"label":"Déssert", "value": "Dessert"}
+  ]
+

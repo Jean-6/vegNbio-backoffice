@@ -1,0 +1,13 @@
+
+
+
+[
+  {"label":"Gluten","value":"Gluten"},
+  {"label":"Crustaces","value":"Shellfish"},
+  {"label":"Oeufs","value":"Eggs"},
+  {"label":"Poissons","value":"Fish"},
+  {"label":"Arachides","value":"Peanuts"},
+  {"label":"Soja","value":"Soy"},
+  {"label":"Lait","value":"Milk"},
+  {"label":"Fruits à coque","value":"Nuts"}
+]

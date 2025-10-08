@@ -1,0 +1,12 @@
+
+
+
+ [
+   {"label": "Local","value": "Local"},
+   {"label": "Importé","value": "Imported"},
+   {"label":"Bio ","value": "Organic"},
+   {"label": "Végétalien","value": "Vegan"},
+   {"label": "Sans-gluten","value": "Gluten-free"},
+   {"label": "Ecoresponsable","value": "Eco-friendly"},
+   {"label": "Autre","value": "Other"}
+]
