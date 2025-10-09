@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <title>Aside Menu Layout</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+
+  </style>
+</head>
+<body>
+
+
+<div class="container-fluid">
+  <div class="row flex-nowrap ">
+    <!-- SideMenu -->
+    <nav class="col-12 col-xs-3 col-md-3 col-xl-2 px-0 bg-dark text-white sidebar">
+      <app-admin-aside-menu/>
+    </nav>
+
+    <main class="col">
+
+      <div class="container-fluid">
+        <app-navbar-top></app-navbar-top>
+      </div>
+
+      <div class="container-fluid">
+        <h3>Liste des réservations</h3>
+      </div>
+
+
+      <div class="container-fluid">
+        <div class="card border-0 shadow rounded-3">
+          <div class="card-body">
+            <form>
+              <div class="row">
+                <div class="col-lg-3 col-md-3 col-12">
+                  <div>
+                    <label class="form-label fw-bold">Id Réservation</label>
+                  </div>
+                  <input
+                    [(ngModel)]="bookingService.reservationFilter.id"
+                    [ngModelOptions]="{standalone: true}"
+                    autocomplete="off"
+                    pInputText
+                    type="text"
+                  />
+                </div>
+
+                <div class="col-lg-3 col-md-3 col-12">
+                  <div>
+                    <label class="form-label fw-bold">Utilisateur</label>
+                  </div>
+                  <input
+                    [(ngModel)]="bookingService.reservationFilter.name"
+                    [ngModelOptions]="{standalone: true}"
+                    autocomplete="off"
+                    pInputText
+                    type="text"
+                  />
+                </div>
+
+                <div class="col-lg-3 col-md-3 col-12">
+                  <div>
+                    <label class="form-label fw-bold">Restaurant</label>
+                  </div>
+                  <p-multiselect
+                    [(ngModel)]="bookingService.reservationFilter.canteenName"
+                    [maxSelectedLabels]="1"
+                    [ngModelOptions]="{standalone: true}"
+                    [options]="statuses"
+                    class="w-full md:w-80"
+                    optionLabel="services"
+                    placeholder="Selectionner un service"
+                  >
+                  </p-multiselect>
+                </div>
+
+                <div class="col-lg-3 col-md-3 col-12">
+                  <div>
+                    <label class="form-label fw-bold">Pers.</label>
+                  </div>
+                  <p-inputnumber
+                    [(ngModel)]="bookingService.reservationFilter.seats"
+                    [ngModelOptions]="{standalone: true}"
+                    [showButtons]="true"
+                    inputId="stacked"
+                    mode="decimal"
+                  ></p-inputnumber>
+                </div>
+
+              </div>
+
+              <div class="row">
+                <div class="col-lg-3 col-md-3 col-12">
+                  <div>
+                    <label class="form-label fw-bold">Type de reservation</label>
+                  </div>
+                  <p-multiselect
+                    [(ngModel)]="bookingService.reservationFilter.type"
+                    [maxSelectedLabels]="1"
+                    [ngModelOptions]="{standalone: true}"
+                    [options]="this.typeParams"
+                    class="w-full md:w-80"
+                    optionLabel="label"
+                    optionValue="value"
+
+                    placeholder="Selectionner un service"
+                  >
+                  </p-multiselect>
+                </div>
+
+
+                <div class="col-lg-3 col-md-4 col-12">
+                  <div>
+                    <label class="form-label fw-bold">Date de debut</label>
+                  </div>
+                  <p-datepicker
+                    [(ngModel)]="bookingService.reservationFilter.startDate"
+                    [ngModelOptions]="{standalone: true}"
+                    [showIcon]="true"
+                    [showOnFocus]="false"
+                    inputId="buttondisplay"
+                  >
+                  </p-datepicker>
+                </div>
+
+                <div class="col-lg-3 col-md-4 col-12">
+                  <div>
+                    <label class="form-label fw-bold">Date de fin </label>
+                  </div>
+                  <p-datepicker
+                    [(ngModel)]="bookingService.reservationFilter.endDate"
+                    [ngModelOptions]="{standalone: true}"
+                    [showIcon]="true"
+                    [showOnFocus]="false"
+                    inputId="buttondisplay"
+                  >
+                  </p-datepicker>
+                </div>
+
+                <div class="col-lg-3 col-md-4 col-12">
+                  <div>
+                    <label class="form-label fw-bold">Status</label>
+                  </div>
+                  <p-multiselect
+                    [(ngModel)]="bookingService.reservationFilter.status"
+                    [maxSelectedLabels]="1"
+                    [ngModelOptions]="{standalone: true}"
+                    [options]="statuses"
+                    class="w-full md:w-80"
+                    id="status"
+                    optionLabel="status"
+                    placeholder="Selectionner un status"
+                  ></p-multiselect>
+                </div>
+              </div>
+
+              <div class="row py-3">
+                <div class="col-lg-4 col-md-6 col-12">
+                  <button class="btn btn-primary " type="button">Rechercher</button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+
+
+      <div class="container-fluid py-4">
+        <div class="card border-0 shadow rounded-3">
+          <div class="card-body p-sm-3">
+            <div class="row d-flex justify-content-start mt-3">
+              @if (isLoading) {
+                <app-loader></app-loader>
+              }
+              <p-table
+                [paginator]="true"
+                [rowsPerPageOptions]="[5, 10, 20]"
+                [rows]="8"
+                [showGridlines]="false"
+                [tableStyle]="{ 'min-width': '70rem' }"
+                [value]="filteredReservations"
+                class="shadow-sm rounded-3 border-0"
+                size="small"
+              >
+                <!-- HEADER -->
+                <ng-template pTemplate="header">
+                  <tr class="bg-light text-secondary fw-semibold">
+                    <th class="py-3">Type</th>
+                    <th class="py-3">Client</th>
+                    <th class="py-3">Restaurant</th>
+                    <th class="py-3">Horaire</th>
+                    <th class="py-3">Date</th>
+                    <th class="py-3">Action</th>
+                  </tr>
+                </ng-template>
+
+                <!-- BODY -->
+                <ng-template let-res pTemplate="body">
+                  <tr class="align-middle hover:bg-light">
+                    <!-- Type -->
+                    <td>
+                      <p-tag
+                        [icon]="res.type === 'ROOM'
+                        ? 'pi pi-building'
+                        : res.type === 'TABLE'
+                        ? 'pi pi-table'
+                        : 'pi pi-calendar'"
+                        [severity]="res.type === 'ROOM'
+                        ? 'info'
+                        : res.type === 'TABLE'
+                        ? 'success'
+                        : 'warning'"
+                        [value]="res.type"
+                        class="text-uppercase fw-semibold"
+                      ></p-tag>
+                    </td>
+
+                    <!-- Client -->
+                    <td>
+                      <div class="d-flex align-items-center gap-2">
+                        <i class="pi pi-user text-primary"></i>
+                        <span class="fw-semibold">{{ res.userInfo?.username || 'Anonyme' }}</span>
+                      </div>
+                    </td>
+
+                    <!-- Restaurant -->
+                    <td>
+                      <div class="d-flex flex-column">
+                        <div class="fw-semibold text-dark">
+                          <i class="pi pi-map-marker text-danger me-2"></i>
+                          {{ res.canteenInfo?.name }}
+                        </div>
+
+                        <small class="text-muted ms-4 text-truncate" style="max-width: 350px;">
+                          {{ res.canteenInfo?.location?.address }},
+                          {{ res.canteenInfo?.location?.postalCode }} {{ res.canteenInfo?.location?.city }},
+                          {{ res.canteenInfo?.location?.country }}
+                        </small>
+                      </div>
+                    </td>
+
+                    <!-- Horaire -->
+                    <td>
+                      <div class="d-flex align-items-center text-muted">
+                        <i class="pi pi-clock me-2 text-success"></i>
+                        <span>
+                          {{ res.startTime }}{{ res.endTime ? ' - ' + res.endTime : ' - Indéfini' }}
+                        </span>
+                      </div>
+                    </td>
+
+                    <!-- Date -->
+                    <td>
+                      <div class="d-flex align-items-center text-muted">
+                        <i class="pi pi-calendar me-2 text-primary"></i>
+                        {{ res.date | date: 'dd/MM/yyyy' }}
+                      </div>
+                    </td>
+
+                    <!-- Actions -->
+                    <td class="text-center">
+                      <div class="d-flex justify-content-center gap-2">
+                        <p-button
+                          (click)="showDetails(res)"
+                          [outlined]="true"
+                          [rounded]="true"
+                          icon="pi pi-eye"
+                          severity="info"
+                          pTooltip="Voir les détails"
+                        ></p-button>
+
+                        <p-button
+                          (click)="delete(res)"
+                          [outlined]="true"
+                          [rounded]="true"
+                          icon="pi pi-trash"
+                          severity="danger"
+                          pTooltip="Supprimer la réservation"
+                        ></p-button>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+
+                <!-- EMPTY MESSAGE -->
+                <!--<ng-template pTemplate="emptymessage">
+                  <tr>
+                    <td class="text-center text-muted py-4" colspan="6">
+                      <i class="pi pi-info-circle me-2"></i>
+                      Aucune réservation trouvée
+                    </td>
+                  </tr>
+                </ng-template>-->
+              </p-table>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </main>
+  </div>
+</div>
+</body>
+
+</html>
