@@ -1,0 +1,7 @@
+
+
+[
+  { "label": "Table", "value": "table" },
+  { "label": "Salle", "value": "room" },
+  { "label": "Evenement", "value": "event" }
+]
