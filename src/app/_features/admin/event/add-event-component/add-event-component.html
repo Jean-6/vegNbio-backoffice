@@ -29,11 +29,11 @@
       <p-stepper [(value)]="activeStep" class="basis-[40rem]">
 
         <p-step-list>
-          <p-step [value]="1">Informations</p-step>
-          <p-step [value]="2">Dates et horaires</p-step>
-          <p-step [value]="3">Lieu</p-step>
-          <p-step [value]="4">Médias</p-step>
-          <p-step [value]="5"></p-step>
+          <p-step [value]="1" style="pointer-events: none">Informations</p-step>
+          <p-step [value]="2" style="pointer-events: none">Dates et horaires</p-step>
+          <p-step [value]="3" style="pointer-events: none">Lieu</p-step>
+          <p-step [value]="4" style="pointer-events: none">Médias</p-step>
+          <p-step [value]="5" style="pointer-events: none"></p-step>
         </p-step-list>
 
 
@@ -41,39 +41,60 @@
           <!-- Étape 1 : Informations générales -->
           <p-step-panel [value]="1">
             <ng-template #content let-activateCallback="activateCallback">
-              <div class="max-w-lg mx-auto min-h-[50rem] flex flex-col"
-                   pAnimateOnScroll enterClass="animate-enter fade-in-10 zoom-in-75 animate-duration-1000">
+              <div
+                class="max-w-lg mx-auto min-h-[50rem] flex flex-col"
+                enterClass="animate-enter fade-in-10 zoom-in-75 animate-duration-1000"
+                leaveClass="animate-leave fade-out-0"
+                pAnimateOnScroll
+              >
                 <h3 class="text-left text-2xl fw-bold text-primary mt-2 mb-4">📌 Informations générales</h3>
 
                 <form [formGroup]="infoForm" class="">
                   <div class="row py-3">
+                    <label class="fw-bold">Type d'événement*</label>
                     <div class="col-md">
-                      <label class="fw-bold">Type d'événement*</label>
-                      <p-multiSelect [maxSelectedLabels]="1" [options]="eventParams" appendTo="body"
-                                     class="form-label mb-0 w-100 mb-3"
-                                     formControlName="type" optionLabel="label"
-                                     optionValue="value" placeholder="Sélectionner le type">
-
-                      </p-multiSelect>
-                    </div>
-
-                    <div class="col-md">
-                      <label class="fw-bold">Nom de l'événement*</label>
-                      <input class="form-label mb-0 w-100 mb-3" formControlName="title" pInputText type="text"/>
+                      <p-autocomplete
+                        (completeMethod)="search_($event)"
+                        [dropdown]="true"
+                        [suggestions]="filteredEventType"
+                        appendTo="body"
+                        class="w-25"
+                        formControlName="type"
+                        optionLabel="label"
+                        optionValue="value"
+                        [pAutoFocus]="true"
+                        [fluid]="true"
+                      ></p-autocomplete>
+                      <div *ngIf="infoForm.get('type')?.invalid && infoForm.get('type')?.touched" class="text-danger" style="font-size: 0.8rem">
+                        Type obligatoire
+                      </div>
                     </div>
                   </div>
 
                   <div class="row py-3">
+                    <label class="fw-bold">Nom de l'événement*</label>
                     <div class="col-md">
-                      <label class="fw-bold">Description*</label>
-                      <textarea class="form-label mb-0 w-100 mb-3" cols="65" formControlName="desc" pTextarea
-                                rows="3"></textarea>
+                      <input class="form-label w-25" formControlName="title" pInputText type="text" [pAutoFocus]="true" [fluid]="true"/>
+                      <div *ngIf="infoForm.get('title')?.invalid && infoForm.get('title')?.touched" class="text-danger" style="font-size: 0.8rem">
+                        Nom obligatoire
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row py-3">
+                    <label class="fw-bold">Description*</label>
+                    <div class="col-md">
+                      <textarea class="form-label w-50 " cols="65" formControlName="desc" pTextarea rows="3" [pAutoFocus]="true" [fluid]="true">
+                      </textarea>
+                      <div *ngIf="infoForm.get('desc')?.invalid && infoForm.get('desc')?.touched" class="text-danger" style="font-size: 0.8rem" >
+                        Description obligatoire
+                      </div>
                     </div>
                   </div>
                 </form>
                 <!-- Barre de navigation -->
                 <div class="flex justify-end pt-6 mt-auto">
-                  <p-button (onClick)="activateCallback(2)" icon="pi pi-arrow-right" iconPos="right" label="Suivant"/>
+                  <p-button  (onClick)="nextStep(infoForm,activateCallback,2)" icon="pi pi-arrow-right" iconPos="right" label="Suivant"/>
                 </div>
               </div>
             </ng-template>
@@ -82,7 +103,11 @@
           <!-- Étape 2 : Dates & horaires -->
           <p-step-panel [value]="2">
             <ng-template #content let-activateCallback="activateCallback">
-              <div class="max-w-xl mx-auto min-h-[30rem] flex flex-col">
+              <div
+                class="max-w-xl mx-auto min-h-[30rem] flex flex-col"
+                enterClass="animate-enter fade-in-10 zoom-in-75 animate-duration-1000"
+                leaveClass="animate-leave fade-out-0"
+                pAnimateOnScroll>
 
                 <!-- Contenu qui prend la place -->
                 <div class="flex-grow">
@@ -98,24 +123,50 @@
 
                         <p-datepicker [showIcon]="true" appendTo="body"
                                       formControlName="date"
-                                      placeholder="Choisir une date"></p-datepicker>
+                                      [minDate]="minDate"
+                                      placeholder="Choisir une date" [fluid]="true"></p-datepicker>
+                        <small *ngIf="date?.hasError('required') && date?.touched" class="text-danger d-block mt-1">
+                          La date est obligatoire.
+                        </small>
+                        <small *ngIf="date?.hasError('pastDate') && date?.touched" class="text-danger d-block mt-1">
+                          La date ne peut pas être antérieure à aujourd’hui.
+                        </small>
                       </div>
                     </div>
 
                     <div class="row d-flex py-3 ">
                       <div class="col-md">
-                      <label class="form-label fw-bold mb-1">Heure de début* </label>
+                        <label class="form-label fw-bold mb-1">Heure de début* </label>
                         <div>
-                          <p-datepicker [timeOnly]="true" appendTo="body" class="w-full"
-                                        formControlName="startTime"></p-datepicker>
+                          <p-datepicker [iconDisplay]="'input'" [showIcon]="true" [timeOnly]="true"
+                                        appendTo="body" class="w-full" formControlName="startTime"
+                                        inputId="templatedisplay" [fluid]="true">
+                            <ng-template #inputicon let-clickCallBack="clickCallBack">
+                              <i (click)="clickCallBack($event)" class="pi pi-clock"></i>
+                            </ng-template>
+                          </p-datepicker>
+                          <small *ngIf="startTime?.hasError('required') && startTime?.touched" class="text-danger d-block mt-1">
+                            Heure de début obligatoire.
+                          </small>
+                          <small *ngIf="dateForm.hasError('invalidTimeRange') && (dateForm.get('startTime')?.touched || dateForm.get('endTime')?.touched)" class="text-danger">
+                            L'heure de début doit être inférieure à l'heure de fin.
+                          </small>
                         </div>
                       </div>
 
                       <div class="col-md">
-                        <label class="form-label mb-1 fw-bold">Heure de début*</label>
+                        <label class="form-label mb-1 fw-bold">Heure de fin*</label>
                         <div>
-                          <p-datepicker [timeOnly]="true" appendTo="body" class="w-full"
-                                        formControlName="endTime"></p-datepicker>
+                          <p-datepicker [iconDisplay]="'input'" [showIcon]="true" [timeOnly]="true" appendTo="body"
+                                        class="w-full" formControlName="endTime" inputId="templatedisplay"  [fluid]="true">
+                            <ng-template #inputicon let-clickCallBack="clickCallBack">
+                              <i (click)="clickCallBack($event)" class="pi pi-clock"></i>
+                            </ng-template>
+                          </p-datepicker>
+                          <small *ngIf="endTime?.hasError('required') && endTime?.touched" class="text-danger d-block mt-1">
+                            Heure de fin obligatoire.
+                          </small>
+
                         </div>
                       </div>
                     </div>
@@ -124,14 +175,14 @@
 
                 <!-- Navigation en bas avec un vrai espace -->
                 <div class="flex justify-between pt-8 mt-5 border-t border-gray-200">
-                  <p-button (onClick)="activateCallback(1)"
+                  <p-button (onClick)="prevStep(1, activateCallback)"
                             icon="pi pi-arrow-left"
                             label="Retour"
-                            severity="secondary" />
-                  <p-button (onClick)="activateCallback(3)"
+                            severity="secondary"/>
+                  <p-button (onClick)="nextStep(dateForm,activateCallback,3)"
+                            class="mx-4"
                             icon="pi pi-arrow-right"
-                            iconPos="right"
-                            label="Suivant" class="mx-4"/>
+                            iconPos="right" label="Suivant"/>
                 </div>
               </div>
             </ng-template>
@@ -140,45 +191,173 @@
           <!-- Étape 3 : Lieu -->
           <p-step-panel [value]="3">
             <ng-template #content let-activateCallback="activateCallback">
-              <div class="max-w-xl mx-auto min-h-[40rem] flex flex-col justify-between">
-                <h3 class="text-left text-2xl fw-bold text-primary mt-4">📍 Lieu</h3>
+              <div
+                class="max-w-xl mx-auto min-h-[40rem] flex flex-col justify-between"
+                enterClass="animate-enter fade-in-10 zoom-in-75 animate-duration-1000"
+                leaveClass="animate-leave fade-out-0"
+                pAnimateOnScroll>
+                <h3 class="text-left text-2xl fw-bold text-primary">📍 Lieu</h3>
 
-                <form [formGroup]="locationForm" class="flex flex-col gap-4">
-                  <div class="row gap-2">
-                    <label class="fw-bold">Restaurant*</label>
-                    <div class="col-md">
-
+                <div class="row g-4 align-items-start">
+                  <!-- 🧩 Colonne 1 : Formulaire -->
+                  <div class="col-lg-3 col-md-4">
+                    <form [formGroup]="locationForm" class="card p-3 shadow-sm rounded-4 border-0 bg-light">
+                      <label class="fw-bold mb-2">Restaurant*</label>
                       <p-autocomplete
-                        [dropdown]="true"
-                        [suggestions]="canteenParams"
                         (completeMethod)="search($event)"
+                        (onSelect)="onCanteenSelect($event)"
+                        [dropdown]="true"
+                        [suggestions]="filteredCanteens"
+                        appendTo="body"
+                        class="w-100"
                         formControlName="location"
                         optionLabel="name"
                         optionValue="id"
-                        appendTo="body"
-                        class="w-full"
+                        placeholder="Rechercher un restaurant"
+                        [pAutoFocus]="true" [fluid]="true"
                       ></p-autocomplete>
+                      <small *ngIf="locationForm.get('location')?.invalid && locationForm.get('location')?.touched" class="text-danger" style="font-size: 0.8rem">
+                        Selectionner un restaurant
+                      </small>
+                    </form>
+                  </div>
+
+                  <!-- 🖼️ Colonne 2 : Galerie -->
+                  <div *ngIf="selectedCanteen" class="col-lg-4 col-md-6">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                      <div class="bg-light d-flex align-items-center justify-content-center p-2">
+                        <app-loader *ngIf="loading"></app-loader>
+                        <p-galleria
+                          *ngIf="!loading && images.length > 0"
+                          [(activeIndex)]="activeIndex"
+                          [containerStyle]="{ width: '100%', 'max-width': '100%' }"
+                          [numVisible]="3"
+                          [responsiveOptions]="responsiveOptions"
+                          [showItemNavigators]="true"
+                          [showThumbnails]="true"
+                          [value]="images"
+                        >
+                          <ng-template #item let-item>
+                            <img
+                              [src]="item?.itemImageSrc"
+                              alt="Photo"
+                              class="w-100 rounded-3 shadow-sm img-fluid"
+                              height="280"
+                              style="object-fit: cover; width: 100%; height: 280px;"
+                              width="400"
+                            />
+                          </ng-template>
+                          <ng-template #thumbnail let-item>
+                            <img
+                              [src]="item?.thumbnailImageSrc"
+                              alt="{{ item.alt }}"
+                              style="width: 60px; height: 40px; object-fit: cover; border-radius: 6px;"
+                            />
+                          </ng-template>
+                        </p-galleria>
+                      </div>
                     </div>
                   </div>
-                </form>
+
+                  <!-- Column 3 : Infos-->
+
+                  <div *ngIf="selectedCanteen" class="col-lg-5 col-md-6">
+                    <div class="card shadow-sm border-0 rounded-4 p-4 ">
+                      <!--<h6 class="fw-bold text-primary mb-2">{{ selectedCanteen.name }}</h6>-->
+                      <p class="text-muted mb-3"> {{ selectedCanteen.desc }}</p>
+
+                      <!-- Equipments -->
+
+                      <div class="mb-3">
+                        <h6 class="fw-semibold">Équipements</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                          <span *ngFor="let eq of selectedCanteen.equipments" class="badge bg-info bg-opacity-25 text-info rounded-pill">
+                            {{ eq }}
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- Capacité et salles de réunion -->
+                      <div class="mb-3">
+                        <div class="d-flex align-items-center gap-3">
+                          <div class="d-flex align-items-center gap-1">
+                            <i class="pi pi-users text-primary"></i>
+                            <span>Places : {{ selectedCanteen.seats }}</span>
+                          </div>
+                          <div class="d-flex align-items-center gap-1">
+                            <i class="pi pi-briefcase text-success"></i>
+                            <span>Salles de réunion : {{ selectedCanteen.meetingRooms }}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Horaires d'ouverture -->
+                     <!-- <div class="col-md-4 p-3 d-flex flex-column justify-content-start">
+                        <p class="fw-semibold mb-2">Horaires d'ouverture</p>
+                        <table class="table table-borderless table-sm mb-0">
+                          <tbody>
+                          <tr *ngFor="let day of getDaysOfWeek()">
+                            <td class="fw-bold">{{ getDayLabel(day) }}</td>
+                            <td>
+                              {{ formatTime(getOpeningHours(day).open) }} - {{ formatTime(getOpeningHours(day).close) }}
+                            </td>
+                          </tr>
+                          </tbody>
+                        </table>
+                      </div>-->
+
+
+                      <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                          <i class="pi pi-map-marker text-danger me-2"></i>
+                          <span>{{ selectedCanteen.location.address }}, {{ selectedCanteen.location.city }}</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                          <i class="pi pi-phone text-success me-2"></i>
+                          <span>{{ selectedCanteen.contact.phone }}</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                          <i class="pi pi-envelope text-primary me-2"></i>
+                          <span>{{ selectedCanteen.contact.email }}</span>
+                        </div>
+                      </div>
+
+                      <div class="d-flex flex-wrap gap-2">
+                        <span *ngFor="let tag of selectedCanteen.tags"
+                              class="badge bg-success bg-opacity-75 rounded-pill">
+                          #{{ tag }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div class="flex justify-between pt-6 mt-5 border-t border-gray-200">
-                <p-button (onClick)="activateCallback(2)" icon="pi pi-arrow-left" label="Retour" severity="secondary"/>
-                <p-button (onClick)="activateCallback(4)" icon="pi pi-arrow-right" iconPos="right" label="Suivant" class="mx-4"/>
+                <p-button (onClick)="prevStep(2, activateCallback)"  icon="pi pi-arrow-left" label="Retour" severity="secondary"/>
+                <p-button (onClick)="nextStep(locationForm,activateCallback,4)" class="mx-4" icon="pi pi-arrow-right" iconPos="right"
+                          label="Suivant"/>
               </div>
             </ng-template>
           </p-step-panel>
 
           <!-- Étape 4 : Médias -->
           <p-step-panel [value]="4">
+
             <ng-template #content let-activateCallback="activateCallback">
-              <div class="max-w-xl mx-auto min-h-[30rem] flex flex-col">
+              <div
+                class="max-w-xl mx-auto min-h-[30rem] flex flex-col"
+                enterClass="animate-enter fade-in-10 zoom-in-75 animate-duration-1000"
+                leaveClass="animate-leave fade-out-0"
+                pAnimateOnScroll>
+                <app-loader *ngIf="loading"></app-loader>
                 <h3 class="text-left text-2xl fw-bold text-primary mt-4">🖼️ Médias</h3>
 
                 <form [formGroup]="mediaForm" class="flex flex-col gap-4">
                   <p-fileupload
+                    [customUpload]="true"
                     (onSelect)="onSelect($event)"
+                    (onClear)="onClear()"
                     (onUpload)="onUpload($event)"
                     [multiple]="true"
                     accept="image/*"
@@ -190,18 +369,22 @@
                     uploadLabel="Uploader"
                   >
                     <ng-template #empty>
-                      <div class="text-gray-400">Glissez-déposez vos images ici</div>
+                      <div class="text-gray-400 text-center py-5 border-dashed border-2 border-gray-300 rounded">
+                        Glissez-déposez vos images ici
+                      </div>
                     </ng-template>
                   </p-fileupload>
+                  <div *ngIf="mediaForm.hasError('noPictures') && mediaForm.touched" class="text-danger text-sm mt-2">
+                    Vous devez uploader au moins une image.
+                  </div>
                 </form>
               </div>
 
 
               <div class="flex justify-between  mt-5 border-t border-gray-200 ">
-                  <p-button (onClick)="activateCallback(3)" icon="pi pi-arrow-left" label="Retour" severity="secondary" />
-                  <p-button (onClick)="activateCallback(5)" icon="pi pi-check" label="Finaliser" class="mx-4"/>
-                </div>
-
+                <p-button (onClick)="prevStep(3, activateCallback)"  icon="pi pi-arrow-left" label="Retour" severity="secondary"/>
+                <p-button (onClick)="onSubmit()" class="mx-4" icon="pi pi-check" label="Enregistrer"/>
+              </div>
 
             </ng-template>
           </p-step-panel>
@@ -209,15 +392,19 @@
           <!-- Étape 5 : Confirmation -->
           <p-step-panel [value]="5">
             <ng-template #content let-activateCallback="activateCallback">
-              <div class="max-w-md mx-auto min-h-[18rem] flex flex-col items-center justify-center gap-6">
-                <h3 class="text-2xl font-bold text-green-600">✅ Événement créé avec succès</h3>
-                <img alt="confirmation" class="w-40"
+              <div class="max-w-md mx-auto min-h-[18rem] flex flex-col items-center justify-center ">
+                <h3 class="text-2xl font-bold text-green-600 ">✅ Événement créé avec succès</h3>
+                <img alt="confirmation" class="mt-4 w-40"
                      src="https://primefaces.org/cdn/primeng/images/stepper/content.svg"/>
               </div>
+              <div class="flex justify-center pt-3">
+                <p-button (onClick)="resetForms()" icon="pi pi-plus" label="Créer un nouvel événement" severity="primary" [routerLink]="['/add-event']"/>
+                <!--(onClick)="activateCallback(1)"-->
+              </div>
 
-              <div class="flex justify-center pt-6">
-                <p-button (onClick)="activateCallback(1)" icon="pi pi-plus" label="Créer un nouvel événement"
-                          severity="primary"/>
+              <div class="flex justify-center pt-3 ">
+                <p-button (onClick)="resetForms()" icon="pi pi-plus" label="Liste des evenements" severity="primary" [routerLink]="['/event-list']"/>
+                <!--(onClick)="activateCallback(1)"-->
               </div>
             </ng-template>
           </p-step-panel>
