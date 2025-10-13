@@ -4,6 +4,8 @@
   REJECTED = 2,
 }*/
 
+import {Location} from '../dto/location';
+
 export enum Status {
   PENDING = "PENDING",
   APPROVED = "APPROVED",
@@ -25,13 +27,7 @@ export interface OpeningHours {
   open: string | null;
   close: string | null;
 }
-export interface Location {
 
-  address: string;
-  city: string;
-  postalCode: string;
-  country: string;
-}
 
 
 export interface Contact{
@@ -46,9 +42,9 @@ export interface Canteen {
   equipments: string[];
   seats: number;
   meetingRooms: number;
-  openingHoursMap: Map<DayOfWeek, OpeningHours>;//Record<DayOfWeek,OpeningHours>;//Map<DayOfWeek, OpeningHours> ;
+  openingHoursMap: Map<DayOfWeek, OpeningHours>;
   location: Location;
-  contact: Contact;
+  contact: Contact ;
   tags: string[];
   menuIds: string[];
   pictures: string[];

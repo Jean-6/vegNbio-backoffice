@@ -39,13 +39,16 @@
                   <div>
                     <label class="form-label fw-bold">Nom du resto</label>
                   </div>
-                  <input
+                  <p-autoComplete
                     [(ngModel)]="canteenService.canteenFilter.name"
+                    [suggestions]="filteredCanteen"
+                    optionValue="id"
+                    optionLabel="name"
+                    (completeMethod)="search($event)"
                     [ngModelOptions]="{standalone: true}"
                     autocomplete="off"
-                    pInputText
-                    type="text"
-                  />
+                    [pAutoFocus]="true" [fluid]="true"
+                  ></p-autoComplete>
                 </div>
 
                 <div class="col-lg-3 col-md-3 col-12">
@@ -58,6 +61,7 @@
                     autocomplete="off"
                     pInputText
                     type="text"
+                    [pAutoFocus]="true" [fluid]="true"
                   />
                 </div>
 
@@ -74,6 +78,7 @@
                     optionValue="value"
                     class="w-full md:w-80"
                     placeholder="Selectionner un service"
+                    [pAutoFocus]="true" [fluid]="true"
                   >
                   </p-multiselect>
                 </div>
@@ -88,18 +93,8 @@
                     autocomplete="off"
                     pInputText
                     type="text"
+                    [pAutoFocus]="true" [fluid]="true"
                   />
-                  <!--
-                  <p-multiselect
-                    id="status"
-                    [(ngModel)]="productService.productFilter.availability"
-                    [options]="statuses"
-                    optionLabel="status"
-                    placeholder="Selectionner un status"
-                    [maxSelectedLabels]="1"
-                    class="w-full md:w-80"
-                    [ngModelOptions]="{standalone: true}"
-                  ></p-multiselect>-->
                 </div>
 
               </div>
@@ -115,6 +110,7 @@
                     [showButtons]="true"
                     inputId="stacked"
                     mode="decimal"
+                    [pAutoFocus]="true" [fluid]="true"
                   ></p-inputnumber>
                 </div>
 
@@ -129,6 +125,7 @@
                     [showIcon]="true"
                     [showOnFocus]="false"
                     inputId="buttondisplay"
+
                   >
                   </p-datepicker>
                 </div>
@@ -143,6 +140,7 @@
                     [showIcon]="true"
                     [showOnFocus]="false"
                     inputId="buttondisplay"
+                    [pAutoFocus]="true" [fluid]="true"
                   >
                   </p-datepicker>
                 </div>
@@ -161,6 +159,7 @@
                     class="w-full md:w-80"
                     id="status"
                     placeholder="Selectionner un status"
+                    [pAutoFocus]="true" [fluid]="true"
                   ></p-multiselect>
                 </div>
               </div>
@@ -224,13 +223,13 @@
                       <!-- Localisation -->
                       <div class="d-flex align-items-center mb-1 text-muted" style="font-size: 0.85rem;">
                         <i class="pi pi-map-marker text-danger me-2"></i>
-                        <span>{{ canteen.location.city }}, {{ canteen.location.country }}</span>
+                        <span>{{ canteen.location.address }}, {{ canteen.location.city }}</span>
                       </div>
 
                       <!-- Contact -->
                       <div class="d-flex align-items-center mb-1 text-muted" style="font-size: 0.85rem;">
                         <i class="pi pi-phone text-primary me-2"></i>
-                        <span>{{ canteen.contact.phone }}</span>
+                        <span>{{ canteen.contact.phone || 'Non renseigné'}}</span>
                       </div>
 
                       <!-- Équipements -->

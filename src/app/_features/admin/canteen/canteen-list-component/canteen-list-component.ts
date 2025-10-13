@@ -6,7 +6,6 @@ import {InputText} from 'primeng/inputtext';
 import {NavbarTop} from '../../../../_core/layout/navbar-top/navbar-top';
 import {CanteenService} from '../../../../_core/services/canteen-service';
 import {CommonModule} from '@angular/common';
-import {CanteenOption, EventOption, StatusOption} from '../../event/event-list-component/event-list-component';
 import {Canteen} from '../../../../_core/models/canteen';
 import {AlertService} from '../../../../_core/services/alert-service';
 import {ResponseWrapper} from '../../../../_core/dto/responseWrapper';
@@ -15,12 +14,11 @@ import {MultiSelect} from 'primeng/multiselect';
 import {InputNumber} from 'primeng/inputnumber';
 import {Loader} from '../../../../_core/layout/loader/loader';
 import {Button} from 'primeng/button';
+import {SelectItem} from '../../../../_core/dto/selectItem';
+import {ParamService, SelectCanteen} from '../../../../_core/services/param-service';
+import {AutoComplete, AutoCompleteCompleteEvent} from 'primeng/autocomplete';
+import {AutoFocus} from 'primeng/autofocus';
 
-
-export interface ServiceOption {
-  id: string;
-  name: string;
-}
 
 @Component({
   selector: 'app-canteen-list-component',
@@ -36,6 +34,8 @@ export interface ServiceOption {
     InputNumber,
     Loader,
     Button,
+    AutoComplete,
+    AutoFocus,
   ],
   templateUrl: './canteen-list-component.html',
   standalone: true,
@@ -43,11 +43,11 @@ export interface ServiceOption {
 })
 export class CanteenListComponent implements OnInit{
 
-  statuses: any[] | undefined;
-  canteenParams: CanteenOption[] = [];
-  eventParams: EventOption[] = [];
-  statusParams: StatusOption[] = [];
-  serviceParams: ServiceOption[] = [];
+  canteenParams: SelectCanteen[] = [];
+  filteredCanteen: SelectCanteen[] = [];
+  eventParams: SelectItem[] = [];
+  statusParams: SelectItem[] = [];
+  serviceParams: SelectItem[] = [];
   canteens: Canteen[] = [];
   items: string[] =[];
   selectedCanteen: Canteen | null = null;
@@ -55,11 +55,13 @@ export class CanteenListComponent implements OnInit{
   isLoading= false;
 
   constructor(protected canteenService: CanteenService,
-              protected alertService: AlertService) {
+              protected alertService: AlertService,
+              protected  paramService: ParamService) {
   }
 
   ngOnInit(): void {
 
+    this.loadCanteenParams()
     this.loadCanteenService()
     this.loadCanteenStatus()
     this.loadCanteens()
@@ -71,7 +73,6 @@ export class CanteenListComponent implements OnInit{
       .subscribe({
         next: (res: ResponseWrapper<Canteen[]>) => {
           this.canteens = res.data;
-          console.log("canteen : "+this.canteens)
           this.isLoading = false;
         },
         error: (err: any) => {
@@ -82,7 +83,7 @@ export class CanteenListComponent implements OnInit{
 
 
   loadCanteenStatus(){
-    this.canteenService.getCanteenStatus()
+    this.paramService.getApprovalStatuses()
       .subscribe({
         next: options => {
           this.statusParams = options;
@@ -95,10 +96,33 @@ export class CanteenListComponent implements OnInit{
   }
 
   loadCanteenService(){
-    this.canteenService.getCanteenService()
+    this.paramService.getServiceTypes()
       .subscribe({
         next: options => {
           this.serviceParams = options;
+        },
+        error: err => {
+          console.error('Error loading service param:', err);
+          this.alertService.error(`Error loading service param: ${err}`);
+        }
+      })
+  }
+
+
+
+  search(event: AutoCompleteCompleteEvent) {
+    const query = event.query.toLowerCase();
+    this.filteredCanteen = this.canteenParams
+      .filter(c => c.name.toLowerCase().includes(query))
+      .filter((c, i, arr) => arr.findIndex(x => x.id === c.id) === i);
+  }
+
+  loadCanteenParams(){
+    this.paramService.getCanteens()
+      .subscribe({
+        next: (options: ResponseWrapper<SelectCanteen[]>) => {
+          this.canteenParams = options.data;
+          this.filteredCanteen = [...options.data];
         },
         error: err => {
           console.error('Error loading service param:', err);

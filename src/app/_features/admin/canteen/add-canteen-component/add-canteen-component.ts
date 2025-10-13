@@ -202,7 +202,7 @@ export class AddCanteenComponent implements OnInit {
 
   loadCities():void{
     this.loading = true;
-    this.paramService.getcities().subscribe({
+    this.paramService.getCities().subscribe({
       next:(cities)=> {
         this.cities = cities
         this.loading = false;
