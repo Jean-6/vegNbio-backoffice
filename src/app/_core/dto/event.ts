@@ -1,7 +1,7 @@
-import {EventType} from '../models/event';
-import {Location, Status} from '../models/canteen';
 import {Approval} from './approval';
 import {EventStatus} from '../models/eventStatus';
+import {EventType} from './eventTytpe';
+import {Location} from './location';
 
 
 export interface Event {

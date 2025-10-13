@@ -15,12 +15,14 @@ import {Event} from '../../../../_core/dto/event';
 import {Canteen, Status} from '../../../../_core/models/canteen';
 import {map} from 'rxjs';
 import {AutoComplete} from 'primeng/autocomplete';
-import {EventType} from '../../../../_core/models/event';
 import {EventStatus} from '../../../../_core/models/eventStatus';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
 import {Image} from 'primeng/image';
 import {PrimeTemplate} from 'primeng/api';
+import {AutoFocus} from 'primeng/autofocus';
+import {ParamService} from '../../../../_core/services/param-service';
+import {SelectItem} from '../../../../_core/dto/selectItem';
 
 
 export interface CanteenOption {
@@ -28,15 +30,6 @@ export interface CanteenOption {
   name: string;
 }
 
-export interface EventOption{
-  label: string;
-  value: EventType;
-}
-
-export interface StatusOption{
-  label: string;
-  value: Status;
-}
 
 @Component({
   selector: 'app-event-list-component',
@@ -55,6 +48,7 @@ export interface StatusOption{
     Dialog,
     Image,
     PrimeTemplate,
+    AutoFocus,
   ],
   templateUrl: './event-list-component.html',
   standalone: true,
@@ -62,47 +56,75 @@ export interface StatusOption{
 })
 export class EventListComponent implements OnInit {
 
-  layout: 'list' | 'grid' = 'list';
-  options: string[] = ['list' ,'grid'];
+
+  options: string[] = ['list', 'grid'];
   canteenParams: CanteenOption[] = [];
-  eventParams: EventOption[] = [];
-  statusParams: StatusOption[] = [];
-  statuses: any[] | undefined;
+  eventTypeParams: SelectItem[] = [];
+  filteredEventType: SelectItem[] = [];
+  statusParams: SelectItem[] = [];
+  filteredStatus: SelectItem[] = [];
   events: Event[] = [];
-  items: string[] =[];
+  items: string[] = [];
   selectedEvent: Event | null = null;
-  visible: boolean =  false ;
+  visible: boolean = false;
+  isLoading = false;
 
   constructor(protected eventService: EventService,
               protected canteenService: CanteenService,
-              private alertService: AlertService) {
+              private alertService: AlertService,
+              private paramService: ParamService) {
   }
 
   ngOnInit(): void {
-    this.loadEventOptions();
+    this.loadEventTypes();
+    this.loadApprovalStatuses();
     this.loadCanteenOptions();
-    this.loadEventStatus();
+    //this.loadEventStatus();
     this.loadEvents()
   }
 
-
-
-
   loadEvents() {
-    this.eventService.isLoading = true;
+    this.isLoading = true;
     this.eventService.getEvents()
       .subscribe({
         next: (res: ResponseWrapper<Event[]>) => {
           this.events = res.data;
-          console.log("event : "+this.events)
         },
         error: (err: any) => {
           console.log(`Error http when fetching events : ${err}`);
         },
-        complete:()=>{
-          this.eventService.isLoading = false;
+        complete: () => {
+          this.isLoading = false;
         }
       });
+  }
+
+  loadApprovalStatuses(): void {
+    this.paramService.getApprovalStatuses().subscribe({
+      next: (options: SelectItem[]) => {
+        this.statusParams = options;
+        this.filteredStatus = [...options]
+      },
+      error: (err) => {
+        console.error('Error loading event param:', err);
+        this.alertService.error(`Error loading event param: ${err}`);
+      }
+    })
+  }
+
+
+  private loadEventTypes(): void {
+    this.paramService.getEventTypes().subscribe({
+      next: (options: SelectItem[]) => {
+        this.eventTypeParams = options;
+        this.filteredEventType = [...options]
+      },
+      error: (err) => {
+        console.error('Error loading event param:', err);
+        this.alertService.error(`Error loading event param: ${err}`);
+      }
+    })
+
   }
 
   loadCanteenOptions() {
@@ -110,7 +132,7 @@ export class EventListComponent implements OnInit {
       map((res: ResponseWrapper<Canteen[]>) => {
         const seenNames = new Set<string>();
         return res.data
-          .map(c => ({ id: c.id, name: c.name } as CanteenOption))
+          .map(c => ({id: c.id, name: c.name} as CanteenOption))
           .filter(c => {
             if (seenNames.has(c.name)) return false;
             seenNames.add(c.name);
@@ -128,7 +150,7 @@ export class EventListComponent implements OnInit {
     });
   }
 
-  loadEventOptions(){
+  /*loadEventOptions() {
     this.eventService.getEventOptions()
       .subscribe({
         next: options => {
@@ -138,10 +160,10 @@ export class EventListComponent implements OnInit {
           console.error('Error loading event param:', err);
           this.alertService.error(`Error loading event param: ${err}`);
         }
-    })
-  }
+      })
+  }*/
 
-  loadEventStatus(){
+  /*loadEventStatus() {
     this.eventService.getEventStatus()
       .subscribe({
         next: options => {
@@ -152,11 +174,11 @@ export class EventListComponent implements OnInit {
           this.alertService.error(`Error loading status param: ${err}`);
         }
       })
-  }
+  }*/
 
-  getStatusFlagClass(event: Event): string{
+  getStatusFlagClass(event: Event): string {
 
-    switch (event.status){
+    switch (event.status) {
       case EventStatus.ONGOING:
         return 'bg-success';
       case EventStatus.UPCOMING:
@@ -171,11 +193,11 @@ export class EventListComponent implements OnInit {
   }
 
 
-  getApprovalFlagClass(event: Event){
+  getApprovalFlagClass(event: Event) {
 
-    if(!event.approval?.status) return 'bg-light text-dark';
+    if (!event.approval?.status) return 'bg-light text-dark';
 
-    switch(event.approval.status){
+    switch (event.approval.status) {
       case Status.PENDING:
         return 'bg-warning text-dark';
       case Status.REJECTED:
@@ -193,7 +215,7 @@ export class EventListComponent implements OnInit {
 
   }
 
-  formatEventDate(event: Event): Date{
+  formatEventDate(event: Event): Date {
     return new Date(`${event.date}`)
   }
 
