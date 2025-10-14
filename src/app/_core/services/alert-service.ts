@@ -7,25 +7,24 @@ import {MessageService} from 'primeng/api';
 export class AlertService {
   constructor(private messageService: MessageService) { }
 
-  success(message: string, summary:string = 'Succès') {
-    this.messageService.add({severity: 'success', summary: summary, detail: message,life:3000});
+  success(message: string, summary:string = 'Succès', duration: number = 3000) {
+    this.messageService.add({severity: 'success', summary: summary, detail: message,life:duration});
   }
 
-  error(message: string, summary: string = 'Erreur'){
-    this.messageService.add({severity: 'error', summary: summary, detail: message,life:3000});
+  error(message: string, summary: string = 'Erreur', duration: number = 3000){
+    this.messageService.add({severity: 'error', summary: summary, detail: message,life:duration});
   }
 
-  info(message: string, summary: string = 'Information'){
-    this.messageService.add({severity: 'info', summary: summary, detail: message,life:3000});
+  info(message: string, summary: string = 'Information', duration: number = 6000){
+    this.messageService.add({severity: 'info', summary: summary, detail: message,life:duration});
 
   }
 
-  warn(message: string , summary: string = 'Avertissement'){
-    this.messageService.add({severity: 'warn', summary: summary, detail: message,life:3000});
+  warn(message: string , summary: string = 'Avertissement', duration: number= 6000){
+    this.messageService.add({severity: 'warn', summary: summary, detail: message,life:duration});
   }
 
   clear(){
     this.messageService.clear()
-
   }
 }
