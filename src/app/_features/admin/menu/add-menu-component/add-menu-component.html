@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <title>Aside Menu Layout</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+
+  </style>
+</head>
+<body>
+
+
+<div class="container-fluid">
+  <div class="row flex-nowrap ">
+    <!-- SideMenu -->
+    <nav class="col-12 col-xs-3 col-md-3 col-xl-2 px-0 bg-dark text-white sidebar">
+      <app-admin-aside-menu/>
+    </nav>
+
+    <main class="col">
+
+      <div class="container-fluid">
+        <app-navbar-top></app-navbar-top>
+      </div>
+
+
+      <p-stepper [(value)]="activeStep" class="basis-[40rem]">
+
+        <p-step-list>
+          <p-step [value]="1" style="pointer-events: none">Informations</p-step>
+          <p-step [value]="2" style="pointer-events: none">Détails</p-step>
+          <p-step [value]="3" style="pointer-events: none">Médias</p-step>
+          <p-step [value]="4" style="pointer-events: none"></p-step>
+        </p-step-list>
+
+        <p-step-panels class="w-full">
+          <!-- Étape 1 : Informations générales -->
+          <p-step-panel [value]="1">
+            <ng-template #content let-activateCallback="activateCallback">
+              <div
+                class="max-w-lg mx-auto min-h-[50rem] flex flex-col"
+                enterClass="animate-enter fade-in-10 zoom-in-75 animate-duration-1000"
+                leaveClass="animate-leave fade-out-0"
+                pAnimateOnScroll
+              >
+                <h3 class="text-left text-2xl fw-bold text-primary mt-2 mb-4">📌 Informations générales</h3>
+                <app-loader *ngIf="loading"></app-loader>
+                <form [formGroup]="infoForm">
+                  <div class="row gy-3">
+
+                    <div class="col-12 col-md-4 d-flex flex-column">
+                      <label class="fw-bold d-block">Type d'item*</label>
+                      <!--class="w-full md:w-56"-->
+                      <p-select [checkmark]="true" [options]="this.menuItemTypes" [showClear]="true"  formControlName="itemType" optionLabel="label" placeholder="Selectionne le type"/>
+                      @if (infoForm.get('itemType')?.invalid && infoForm.get('itemType')?.touched) {
+                        <div class="text-danger" style="font-size: 0.8rem">
+                          Nom du restaurant obligatoire
+                        </div>
+                      }
+                    </div>
+
+                    <div class="col-12 col-md-4 d-flex flex-column">
+                      <label class="fw-bold d-block">Nom du restaurant*</label>
+                      <p-autocomplete (completeMethod)="search($event)" [suggestions]="this.filteredCanteen"  formControlName="canteen" optionLabel="name" optionValue="id">
+                      </p-autocomplete>
+                      @if (infoForm.get('canteen')?.invalid && infoForm.get('canteen')?.touched) {
+                        <div class="text-danger" style="font-size: 0.8rem">
+                          Nom du restaurant obligatoire
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="row gy-3">
+                    <div class="col-12 col-md-4 d-flex flex-column">
+                      <label class="fw-bold d-block">Designation</label>
+                      <input type="text" pInputText formControlName="name" [fluid]="true" [pAutoFocus]="true"/>
+                      @if (infoForm.get('name')?.invalid && infoForm.get('name')?.touched) {
+                        <div class="text-danger" style="font-size: 0.8rem">
+                          Désignation obligatoire
+                        </div>
+                      }
+                    </div>
+                    <div class="col-12 col-md-4 d-flex flex-column">
+                      <label class="fw-bold d-block">Prix*</label>
+                      <input  class="form-label w-75" formControlName="price" pInputText pKeyFilter="num" type="text" [fluid]="true" [pAutoFocus]="true"/>
+                      @if (infoForm.get('price')?.invalid && infoForm.get('price')?.touched) {
+                        <div class="text-danger" style="font-size: 0.8rem">
+                          Prix obligatoire
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="row py-2">
+                    <div class="col-md-6">
+                      <label class="fw-bold d-block">Description*</label>
+                      <textarea [fluid]="true" [pAutoFocus]="true" class="form-label" cols="50" formControlName="desc" pTextarea rows="3">
+                      </textarea>
+                      @if (infoForm.get('desc')?.invalid && infoForm.get('desc')?.touched) {
+                        <div class="text-danger" style="font-size: 0.8rem">
+                          Description obligatoire
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                </form>
+                <!-- Barre de navigation -->
+                <div class="flex justify-end pt-6 mt-auto">
+                  <p-button (onClick)="nextStep(infoForm,activateCallback,2)" icon="pi pi-arrow-right" iconPos="right" label="Suivant"/>
+                </div>
+              </div>
+
+            </ng-template>
+          </p-step-panel>
+
+          <!-- Étape 2 : Details -->
+
+          @if (selectedType === 'appetizer' || selectedType === 'meal' || selectedType === 'dessert'){
+          <p-step-panel [value]="2">
+            <ng-template #content let-activateCallback="activateCallback">
+              <div
+                class="max-w-lg mx-auto min-h-[50rem] flex flex-col"
+                enterClass="animate-enter fade-in-10 zoom-in-75 animate-duration-1000"
+                leaveClass="animate-leave fade-out-0"
+                pAnimateOnScroll>
+
+                <h3 class="text-left text-2xl fw-bold text-primary mt-2 mb-4"></h3>
+                  <h3 class="text-left text-2xl fw-bold text-primary mt-2 mb-4">Ingredients</h3>
+                  <p-picklist
+                    [dragdrop]="true"
+                    [responsive]="true"
+                    [source]="sourceIngredients"
+                    [target]="targetIngredients"
+                    breakpoint="1400px"
+                    filterBy="label"
+                    scrollHeight="12rem"
+                    sourceFilterPlaceholder="Rechercher par nom"
+                    targetFilterPlaceholder="Rechercher par nom"
+                  >
+                    <ng-template let-option pTemplate="item">
+                      <div class="flex flex-wrap p-1 items-center gap-4 w-full">
+                        <i
+                          class="pi {{option.icon }}"
+                          style="font-size: 1.5rem;">
+                        </i>
+                        <div class="flex-1 flex flex-col">
+                          <span class="font-medium text-sm">{{ option.label }}</span>
+                        </div>
+                      </div>
+                    </ng-template>
+                  </p-picklist>
+
+                  <h3 class="text-left text-2xl fw-bold text-primary mt-2 mb-4">Allergenes</h3>
+                  <p-picklist
+                    [dragdrop]="true"
+                    [responsive]="true"
+                    [source]="sourceAllergens"
+                    [target]="targetAllergens"
+                    breakpoint="1400px"
+                    filterBy="label"
+                    scrollHeight="12rem"
+                    sourceFilterPlaceholder="Rechercher par nom"
+                    targetFilterPlaceholder="Rechercher par nom"
+                  >
+                    <ng-template let-option pTemplate="item">
+                      <div class="flex flex-wrap p-1 items-center gap-4 w-full">
+                        <div class="flex-1 flex flex-col">
+                          <span class="font-medium text-sm">{{ option.label }}</span>
+                        </div>
+                      </div>
+                    </ng-template>
+                  </p-picklist>
+               <!-- </form>-->
+              </div>
+
+              <div class="flex justify-between pt-8 mt-5 border-t border-gray-200">
+                <p-button (onClick)="prevStep(1, activateCallback)" icon="pi pi-arrow-left" label="Retour"
+                          severity="secondary"/>
+                <p-button (onClick)="nextStep(mealForm, activateCallback, 3)" class="mx-4" icon="pi pi-arrow-right"
+                          iconPos="right" label="Suivant"/>
+              </div>
+
+            </ng-template>
+          </p-step-panel>
+
+          }
+
+
+            @if (selectedType === 'drink') {
+              <p-step-panel [value]="2">
+                <ng-template #content let-activateCallback="activateCallback">
+                  <div class="max-w-lg mx-auto min-h-[50rem] flex flex-col">
+
+                    <h3 class="text-left text-2xl fw-bold text-primary mt-2 mb-4">Détails sur boissons</h3>
+                    <form [formGroup]="drinkForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+
+                      <div class="row flex  align-items-center">
+                        <div class="col-md-4">
+                          <label  class="mx-2">Volume</label>
+                          <p-select [options]="drinkVolumes" formControlName="volume" optionLabel="label" optionValue="value" placeholder="Sélectionner un volume" class="w-full md:w-56"  appendTo="body" />
+                        </div>
+
+                        <div class="col-md-4">
+                          <p-checkbox id="isGaseous" inputId="isGaseous" formControlName="isGaseous" binary="true"
+                                      [pAutoFocus]="true"  />
+                          <label for="isGaseous" class="mx-2">Gazeux</label>
+                        </div>
+
+
+                        <div class="col-md-4">
+                          <p-checkbox id="isAlcoholic" inputId="isAlcoholic" formControlName="isAlcoholic" binary="true"
+                                      [pAutoFocus]="true"  />
+                          <label for="isAlcoholic" class="mx-2">Alcoolisé</label>
+                        </div>
+                      </div>
+
+                    </form>
+                  </div>
+
+                  <div class="flex justify-between pt-8 mt-5 border-t border-gray-200">
+                    <p-button (onClick)="prevStep(1, activateCallback)" icon="pi pi-arrow-left" label="Retour" severity="secondary"></p-button>
+                    <p-button (onClick)="nextStep(drinkForm, activateCallback, 3)" icon="pi pi-arrow-right" iconPos="right" label="Suivant" class="mx-5"></p-button>
+                  </div>
+                </ng-template>
+              </p-step-panel>
+            }
+
+
+          <!-- Étape 4 : Médias -->
+          <p-step-panel [value]="3">
+
+            <ng-template #content let-activateCallback="activateCallback">
+
+              <div
+                class="max-w-xl mx-auto min-h-[30rem] flex flex-col"
+                enterClass="animate-enter fade-in-10 zoom-in-75 animate-duration-1000"
+                leaveClass="animate-leave fade-out-0"
+                pAnimateOnScroll>
+                <app-loader *ngIf="loading"></app-loader>
+                <h3 class="text-left text-2xl fw-bold text-primary mt-4">🖼️ Médias</h3>
+
+                <form [formGroup]="mediaForm" class="flex flex-col gap-4">
+                  <p-fileupload
+                    [customUpload]="true"
+                    (onSelect)="onSelect($event)"
+                    (onUpload)="onUpload($event)"
+                    [multiple]="true"
+                    accept="image/*"
+                    cancelLabel="Annuler"
+                    chooseLabel="Choisir"
+                    class="w-full"
+                    maxFileSize="1000000"
+                    mode="advanced"
+                    uploadLabel="Uploader"
+                  >
+                    <ng-template #empty>
+                      <div class="text-gray-400 text-center py-5 border-dashed border-2 border-gray-300 rounded">
+                        Glissez-déposez vos images ici
+                      </div>
+                    </ng-template>
+                  </p-fileupload>
+                </form>
+              </div>
+              <div class="flex justify-between  mt-5 border-t border-gray-200 ">
+                <p-button (onClick)="activateCallback(2)" icon="pi pi-arrow-left" label="Retour" severity="secondary"/>
+                <p-button (onClick)="onSubmit()" class="mx-4" icon="pi pi-check" label="Enregistrer"/>
+              </div>
+            </ng-template>
+          </p-step-panel>
+
+          <!-- Étape 5 : Confirmation -->
+          <p-step-panel [value]="4">
+            <ng-template #content let-activateCallback="activateCallback">
+              <div class="max-w-md mx-auto min-h-[18rem] flex flex-col items-center justify-center ">
+                <h3 class="text-2xl font-bold text-green-600 ">✅ Produits rajoutés aux menus créé avec succès</h3>
+                <img alt="confirmation" class="mt-4 w-40"
+                     src="https://primefaces.org/cdn/primeng/images/stepper/content.svg"/>
+              </div>
+              <div class="flex justify-center pt-3">
+                <p-button (onClick)="resetForms()" icon="pi pi-plus" label="Ajouter un nouveau produit" severity="primary" [routerLink]="['/add-menu']"/>
+              </div>
+
+              <div class="flex justify-center pt-3 ">
+                <p-button (onClick)="resetForms()" icon="pi pi-plus" label="Voir menus" severity="primary" [routerLink]="['/menu-list']"/>
+              </div>
+            </ng-template>
+          </p-step-panel>
+
+
+        </p-step-panels>
+
+      </p-stepper>
+    </main>
+  </div>
+</div>
+</body>
+</html>
+
