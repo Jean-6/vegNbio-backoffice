@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {AdminAsideMenu} from '../../../../_core/layout/admin-aside-menu/admin-aside-menu';
 import {DatePicker} from 'primeng/datepicker';
 import {FormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
@@ -18,13 +17,13 @@ import {SelectItem} from '../../../../_core/dto/selectItem';
 import {ParamService, SelectCanteen} from '../../../../_core/services/param-service';
 import {AutoComplete, AutoCompleteCompleteEvent} from 'primeng/autocomplete';
 import {AutoFocus} from 'primeng/autofocus';
+import {AsideMenuComponent} from '../../../../_core/layout/aside-menu-component/aside-menu-component';
 
 
 @Component({
   selector: 'app-canteen-list-component',
   imports: [
     CommonModule,
-    AdminAsideMenu,
     DatePicker,
     FormsModule,
     InputText,
@@ -36,6 +35,7 @@ import {AutoFocus} from 'primeng/autofocus';
     Button,
     AutoComplete,
     AutoFocus,
+    AsideMenuComponent,
   ],
   templateUrl: './canteen-list-component.html',
   standalone: true,
@@ -118,11 +118,13 @@ export class CanteenListComponent implements OnInit{
   }
 
   loadCanteenParams(){
+    this.isLoading = true;
     this.paramService.getCanteens()
       .subscribe({
         next: (options: ResponseWrapper<SelectCanteen[]>) => {
           this.canteenParams = options.data;
           this.filteredCanteen = [...options.data];
+          this.isLoading = false;
         },
         error: err => {
           console.error('Error loading service param:', err);

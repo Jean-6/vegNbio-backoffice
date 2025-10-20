@@ -4,7 +4,6 @@ import {Step, StepList, StepPanel, StepPanels, Stepper} from 'primeng/stepper';
 import {AnimateOnScroll} from 'primeng/animateonscroll';
 import {FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Button} from 'primeng/button';
-import {AdminAsideMenu} from '../../../../_core/layout/admin-aside-menu/admin-aside-menu';
 import {GalleriaModule} from 'primeng/galleria';
 import {InputText} from 'primeng/inputtext';
 import {Textarea} from 'primeng/textarea';
@@ -12,7 +11,6 @@ import {CanteenService} from '../../../../_core/services/canteen-service';
 import {AlertService} from '../../../../_core/services/alert-service';
 import {AuthService} from '../../../../_core/services/auth-service';
 import {Canteen} from '../../../../_core/models/canteen';
-import {FullCalendarModule} from '@fullcalendar/angular';
 import {TableModule} from 'primeng/table';
 import {DatePicker} from 'primeng/datepicker';
 import {PickList, PickListModule} from 'primeng/picklist';
@@ -25,6 +23,8 @@ import {AddCanteen, DayOfWeek, OpeningHours} from '../../../../_core/dto/addCant
 import {Location} from '../../../../_core/dto/location';
 import {Select} from 'primeng/select';
 import {AutoFocus} from 'primeng/autofocus';
+import {CommonModule} from '@angular/common';
+import {AsideMenuComponent} from '../../../../_core/layout/aside-menu-component/aside-menu-component';
 
 
 const dayMap: { [key: string]: DayOfWeek } = {
@@ -42,12 +42,12 @@ const dayMap: { [key: string]: DayOfWeek } = {
 @Component({
   selector: 'app-add-canteen-component',
   imports: [
+    CommonModule,
     NavbarTop,
     StepList,
     Stepper,
     Step,
     ReactiveFormsModule,
-    AdminAsideMenu,
     GalleriaModule,
     StepPanel,
     StepPanels,
@@ -55,7 +55,6 @@ const dayMap: { [key: string]: DayOfWeek } = {
     Button,
     InputText,
     Textarea,
-    FullCalendarModule,
     TableModule,
     DatePicker,
     PickListModule,
@@ -64,6 +63,7 @@ const dayMap: { [key: string]: DayOfWeek } = {
     RouterLink,
     Select,
     AutoFocus,
+    AsideMenuComponent,
   ],
   templateUrl: './add-canteen-component.html',
   standalone: true,
@@ -208,8 +208,8 @@ export class AddCanteenComponent implements OnInit {
         this.loading = false;
       },
       error:(err)=> {
-        console.error("Error loading cities")
-        this.alertService.error("Error loading cities")
+        console.error('Error loading cities', err)
+        this.alertService.error('Error loading cities',err)
       }
     });
   }

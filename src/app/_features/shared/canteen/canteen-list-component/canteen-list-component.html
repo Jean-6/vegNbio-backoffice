@@ -16,7 +16,7 @@
   <div class="row flex-nowrap ">
     <!-- SideMenu -->
     <nav class="col-12 col-xs-3 col-md-3 col-xl-2 px-0 bg-dark text-white sidebar">
-      <app-admin-aside-menu/>
+      <app-aside-menu-component/>
     </nav>
 
     <main class="col">
@@ -178,7 +178,7 @@
 
       <div class="container-fluid py-4">
         <div class="card border-0 shadow rounded-3">
-          <div class="card-body  p-sm-2">
+          <div class="card-body  p-sm-2" style="max-height: 56vh; overflow-y:auto ">
 
             <div class="row d-flex justify-content-start mt-3">
               @if (isLoading) {
@@ -187,7 +187,7 @@
             </div>
 
 
-            <div class="container-fluid mt-4 mb-5">
+            <div class="container-fluid py-2">
               <div class="row g-4">
                 <div *ngFor="let canteen of canteens" class="col-12 col-sm-6 col-md-4 col-lg-3">
                   <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden"
