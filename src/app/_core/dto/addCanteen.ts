@@ -1,22 +1,7 @@
 
 import {Location} from './location';
+import {DayOfWeek, OpeningHours} from '../models/canteen';
 
-
-
-export interface OpeningHours {
-  openingTime: string;
-  closeTime: string;
-}
-
-export enum DayOfWeek {
-  Monday = 'Monday',
-  Tuesday = 'Tuesday',
-  Wednesday = 'Wednesday',
-  Thursday = 'Thursday',
-  Friday = 'Friday',
-  Saturday = 'Saturday',
-  Sunday = 'Sunday'
-}
 
 export interface Contact{
   email: string;
@@ -30,7 +15,7 @@ export interface AddCanteen{
   desc: string;
   equipments: string[];
   meetingRooms: number;
-  openingHoursMap: Map<DayOfWeek, OpeningHours> ;
+  openingHoursMap: Record<string, OpeningHours> ;
   location: Location;
   tags: string[];
   userId: string;

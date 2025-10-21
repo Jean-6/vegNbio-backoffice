@@ -1,10 +1,6 @@
-/*export enum Status{
-  PENDING = 0,
-  APPROVED = 1,
-  REJECTED = 2,
-}*/
 
 import {Location} from '../dto/location';
+import {Approval} from '../dto/approval';
 
 export enum Status {
   PENDING = "PENDING",
@@ -13,19 +9,20 @@ export enum Status {
 }
 
 
-export enum DayOfWeek {
-  Monday,
-  Tuesday,
-  Wednesday,
-  Thursday,
-  Friday,
-  Saturday,
-  Sunday
-}
 
 export interface OpeningHours {
-  open: string | null;
-  close: string | null;
+  open: string ;
+  close: string;
+}
+
+export enum DayOfWeek {
+  MONDAY = 'MONDAY',
+  TUESDAY = 'TUESDAY',
+  WEDNESDAY = 'WEDNESDAY',
+  THURSDAY = 'THURSDAY',
+  FRIDAY = 'FRIDAY',
+  SATURDAY = 'SATURDAY',
+  SUNDAY = 'SUNDAY'
 }
 
 
@@ -42,13 +39,12 @@ export interface Canteen {
   equipments: string[];
   seats: number;
   meetingRooms: number;
-  openingHoursMap: Map<DayOfWeek, OpeningHours>;
+  openingHoursMap: Record<string, OpeningHours> ;
   location: Location;
   contact: Contact ;
   tags: string[];
   menuIds: string[];
   pictures: string[];
-  status: Status;
-  rejectionReasons: string;
+  approval: Approval;
   createdAt: Date;
 }

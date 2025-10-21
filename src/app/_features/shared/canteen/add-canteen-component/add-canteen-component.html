@@ -41,10 +41,8 @@
           <p-step-panel [value]="1">
             <ng-template #content let-activateCallback="activateCallback">
               <div
+                [@fadeAnimation]
                 class="max-w-lg mx-auto min-h-[50rem] flex flex-col"
-                enterClass="animate-enter fade-in-10 zoom-in-75 animate-duration-1000"
-                leaveClass="animate-leave fade-out-0"
-                pAnimateOnScroll
               >
                 <h3 class="text-left text-2xl fw-bold text-primary mt-2 mb-4">📌 Informations générales</h3>
                 <form [formGroup]="infoForm">
@@ -53,52 +51,61 @@
                     <div class="col-md-4">
 
                       <label class="fw-bold d-block">Nom du restaurant*</label>
-                      <input class="form-label w-75" type="text" pInputText  formControlName="name" [pAutoFocus]="true" [fluid]="true"/>
-                      <div *ngIf="infoForm.get('name')?.invalid && infoForm.get('name')?.touched" class="text-danger" style="font-size: 0.8rem" >
+                      <input [fluid]="true" [pAutoFocus]="true" class="form-label w-75" formControlName="name" pInputText
+                             type="text"/>
+                      <div *ngIf="infoForm.get('name')?.invalid && infoForm.get('name')?.touched" class="text-danger"
+                           style="font-size: 0.8rem">
                         Nom du restaurant obligatoire
                       </div>
                     </div>
 
                     <div class="col-md-4">
                       <label class="fw-bold d-block">Email*</label>
-                      <input class="form-label w-75" type="email" pInputText  formControlName="email" [pAutoFocus]="true" [fluid]="true"/>
-                      <div *ngIf="infoForm.get('email')?.invalid && infoForm.get('email')?.touched" class="text-danger" style="font-size: 0.8rem">
+                      <input [fluid]="true" [pAutoFocus]="true" class="form-label w-75" formControlName="email" pInputText
+                             type="email"/>
+                      <div *ngIf="infoForm.get('email')?.invalid && infoForm.get('email')?.touched" class="text-danger"
+                           style="font-size: 0.8rem">
                         Email obligatoire
                       </div>
                     </div>
 
 
-                      <div class="col-md-4">
-                        <label class="fw-bold d-block">Tel*</label>
-                        <input class="form-label w-75" type="text" pInputText formControlName="phone" [pAutoFocus]="true" [fluid]="true"/>
-                        <div *ngIf="infoForm.get('phone')?.invalid && infoForm.get('phone')?.touched" class="text-danger" style="font-size: 0.8rem">
-                          Numero de contact obligatoire
-                        </div>
+                    <div class="col-md-4">
+                      <label class="fw-bold d-block">Tel*</label>
+                      <input [fluid]="true" [pAutoFocus]="true" class="form-label w-75" formControlName="phone" pInputText
+                             type="text"/>
+                      <div *ngIf="infoForm.get('phone')?.invalid && infoForm.get('phone')?.touched" class="text-danger"
+                           style="font-size: 0.8rem">
+                        Numero de contact obligatoire
                       </div>
+                    </div>
                   </div>
 
                   <div class="d-flex row py-2">
                     <div class="col-md-6">
                       <label class="fw-bold d-block">Adresse*</label>
-                      <input class="form-label w-75" type="text" pInputText formControlName="address" [pAutoFocus]="true" [fluid]="true"/>
-                      <div *ngIf="infoForm.get('address')?.invalid && infoForm.get('address')?.touched" class="text-danger" style="font-size: 0.8rem">
+                      <input [fluid]="true" [pAutoFocus]="true" class="form-label w-75" formControlName="address"
+                             pInputText type="text"/>
+                      <div *ngIf="infoForm.get('address')?.invalid && infoForm.get('address')?.touched"
+                           class="text-danger" style="font-size: 0.8rem">
                         Adresse obligatoire
                       </div>
                     </div>
                     <div class="col-md-6">
                       <label class="fw-bold d-block">Ville*</label>
                       <p-select
-                        [options]="cities"
-                        formControlName = "city"
                         [checkmark]="true"
-                        optionLabel="label"
-                        optionValue="value"
+                        [fluid]="true"
+                        [options]="cities"
+                        [pAutoFocus]="true"
                         [showClear]="true"
-                        placeholder="Selectionner une ville"
                         class="form-label w-75"
-                        [pAutoFocus]="true" [fluid]="true"
+                        formControlName="city"
+                        optionLabel="label"
+                        optionValue="value" placeholder="Selectionner une ville"
                       />
-                      <div *ngIf="infoForm.get('city')?.invalid && infoForm.get('city')?.touched" class="text-danger" style="font-size: 0.8rem">
+                      <div *ngIf="infoForm.get('city')?.invalid && infoForm.get('city')?.touched" class="text-danger"
+                           style="font-size: 0.8rem">
                         Ville obligatoire
                       </div>
                     </div>
@@ -107,9 +114,11 @@
                   <div class="row py-2">
                     <div class="col-md">
                       <label class="fw-bold d-block">Description*</label>
-                      <textarea class="form-label" cols="70" formControlName="desc" pTextarea rows="3" [pAutoFocus]="true" [fluid]="true">
+                      <textarea [fluid]="true" [pAutoFocus]="true" class="form-label" cols="70" formControlName="desc"
+                                pTextarea rows="3">
                       </textarea>
-                      <div *ngIf="infoForm.get('desc')?.invalid && infoForm.get('desc')?.touched" class="text-danger" style="font-size: 0.8rem">
+                      <div *ngIf="infoForm.get('desc')?.invalid && infoForm.get('desc')?.touched" class="text-danger"
+                           style="font-size: 0.8rem">
                         Adresse obligatoire
                       </div>
                     </div>
@@ -118,7 +127,8 @@
                 </form>
                 <!-- Barre de navigation -->
                 <div class="flex justify-end pt-6 mt-auto">
-                  <p-button (onClick)="nextStep(infoForm,activateCallback,2)" icon="pi pi-arrow-right" iconPos="right" label="Suivant"/>
+                  <p-button (onClick)="nextStep(infoForm,activateCallback,2)" icon="pi pi-arrow-right" iconPos="right"
+                            label="Suivant"/>
                 </div>
               </div>
 
@@ -129,15 +139,13 @@
           <p-step-panel [value]="2">
             <ng-template #content let-activateCallback="activateCallback">
               <div
-                   class="max-w-lg mx-auto min-h-[50rem] flex flex-col"
-                   enterClass="animate-enter fade-in-10 zoom-in-75 animate-duration-1000"
-                   leaveClass="animate-leave fade-out-0"
-                   pAnimateOnScroll>
+                [@fadeAnimation]
+                class="max-w-lg mx-auto min-h-[50rem] flex flex-col">
 
                 <h3 class="text-left text-2xl fw-bold text-primary mt-2 mb-4">Horaires d’ouverture</h3>
                 <form
-                  *ngIf="hourlyForm"
-                  [formGroup]="hourlyForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+                  (ngSubmit)="onSubmit()"
+                  *ngIf="hourlyForm" [formGroup]="hourlyForm" class="flex flex-col gap-4">
                   <div formArrayName="days">
 
                     <div *ngFor="let day of daysArray.controls; let i = index"
@@ -156,29 +164,29 @@
                         <span> {{ day.value.day }}</span>
 
                         <p-datepicker
-                          inputId="datepicker-ouverture-{{i}}"
-                          formControlName="opening"
-                          [timeOnly]="true"
-                          showIcon
-                          icon="pi pi-clock"
-                          hourFormat="24"
                           [style]="{ width: '8rem' }"
-
+                          [timeOnly]="true"
                           class="border rounded-lg px-2 py-1 shadow-sm focus:shadow-md transition duration-200 mx-4"
+                          formControlName="open"
+                          hourFormat="24"
+                          icon="pi pi-clock"
+                          inputId="datepicker-ouverture-{{i}}"
+
+                          showIcon
                         ></p-datepicker>
 
                         <span class="text-gray-500 font-medium">à</span>
 
                         <!-- Fermeture -->
                         <p-datepicker
-                          inputId="datepicker-fermeture-{{i}}"
-                          formControlName="closing"
-                          [timeOnly]="true"
-                          showIcon
-                          icon="pi pi-clock"
-                          hourFormat="24"
                           [style]="{ width: '8rem' }"
+                          [timeOnly]="true"
                           class="border rounded-lg px-2 py-1 shadow-sm focus:shadow-md transition duration-200 mx-4"
+                          formControlName="close"
+                          hourFormat="24"
+                          icon="pi pi-clock"
+                          inputId="datepicker-fermeture-{{i}}"
+                          showIcon
                         ></p-datepicker>
 
                       </div>
@@ -188,8 +196,10 @@
               </div>
 
               <div class="flex justify-between pt-8 mt-5 border-t border-gray-200">
-                <p-button (onClick)="prevStep(1, activateCallback)" icon="pi pi-arrow-left" label="Retour" severity="secondary"/>
-                <p-button (onClick)="nextStep(hourlyForm, activateCallback, 3)" icon="pi pi-arrow-right" iconPos="right" label="Suivant"/>
+                <p-button (onClick)="prevStep(1, activateCallback)" icon="pi pi-arrow-left" label="Retour"
+                          severity="secondary"/>
+                <p-button (onClick)="nextStep(hourlyForm, activateCallback, 3)" class="mx-4" icon="pi pi-arrow-right"
+                          iconPos="right" label="Suivant"/>
 
               </div>
 
@@ -200,44 +210,63 @@
           <p-step-panel [value]="3">
             <ng-template #content let-activateCallback="activateCallback">
               <div
-                class="max-w-lg mx-auto min-h-[50rem] flex flex-col"
-                enterClass="animate-enter fade-in-10 zoom-in-75 animate-duration-1000"
-                leaveClass="animate-leave fade-out-0"
-                pAnimateOnScroll>
+                [@fadeAnimation]
+                class="max-w-lg mx-auto min-h-[50rem] flex flex-col">
 
-                  <p-picklist
-                    [source]="sourceServices"
-                    [target]="targetServices"
-                    [dragdrop]="true"
-                    [responsive]="true"
-                    sourceFilterPlaceholder="Search by name"
-                    targetFilterPlaceholder="Search by name"
-                    breakpoint="1400px"
-                    scrollHeight="20rem">
-                    <ng-template let-option let-selected="selected" #item>
-                      <div class="flex flex-wrap p-1 items-center gap-4 w-full">
+                <form [formGroup]="servicesForm">
 
-                        <!--<i [class]="option.icon + ' text-xl text-gray-700'"></i>-->
-                        <span>  <i [class]="option.icon + 'text-xl text-gray-700'"></i> </span>
 
-                        <div class="flex-1 flex flex-col">
-                          <span class="font-medium text-sm">{{ option.label }}</span>
-                          <span
-                            [ngClass]="{
+                  <div class="col-12 col-md-6">
+                    <p-picklist
+                      [dragdrop]="true"
+                      [responsive]="true"
+                      [source]="sourceServices"
+                      [target]="targetServices"
+                      optionLabel="label"
+
+                      breakpoint="1400px"
+                      scrollHeight="20rem"
+                      sourceFilterPlaceholder="Search by name"
+                      targetFilterPlaceholder="Search by name">
+                      <ng-template #item let-option let-selected="selected">
+                        <div class="flex flex-wrap p-1 items-center gap-4 w-full">
+
+                          <!--<i [class]="option.icon + ' text-xl text-gray-700'"></i>-->
+                          <span>  <i [class]="option.icon + 'text-xl text-gray-700'"></i> </span>
+
+                          <div class="flex-1 flex flex-col">
+                            <span class="font-medium text-sm">{{ option.label }}</span>
+                            <span
+                              [ngClass]="{
                           'text-surface-500': !selected,
                           'dark:text-surface-400': !selected,
                           'text-inherit': selected,
                           }"></span
-                          >
+                            >
+                          </div>
+                          <span class="font-bold sm:ml-8">{{ option.value }}</span>
                         </div>
-                        <span class="font-bold sm:ml-8">{{ option.value }}</span>
-                      </div>
-                    </ng-template>
-                  </p-picklist>
-                  <div class="flex justify-between pt-8 mt-5 border-t border-gray-200">
-                    <p-button (onClick)="prevStep(2, activateCallback)" icon="pi pi-arrow-left" label="Retour" severity="secondary"/>
-                    <p-button (onClick)="nextStep(3, activateCallback, 4)" icon="pi pi-arrow-right" iconPos="right" label="Suivant"/>
+                      </ng-template>
+                    </p-picklist>
                   </div>
+
+                  <div class="col-12 col-md-6 py-3">
+                    <div class="form-group d-flex flex-column">
+                      <label class="fw-bold mb-1">Salle de réunion</label>
+                      <input class="form-control w-25" formControlName="room" pInputText pKeyFilter="num" type="text"/>
+                      <div *ngIf="infoForm.get('room')?.invalid && infoForm.get('room')?.touched"
+                           class="text-danger small mt-1">
+                        Preciser le nombre de salle
+                      </div>
+                    </div>
+                  </div>
+                </form>
+                <div class="flex justify-between pt-8 mt-5 border-t border-gray-200">
+                  <p-button (onClick)="prevStep(2, activateCallback)" icon="pi pi-arrow-left" label="Retour"
+                            severity="secondary"/>
+                  <p-button (onClick)="nextStep(3, activateCallback, 4)" class="mx-4" icon="pi pi-arrow-right"
+                            iconPos="right" label="Suivant"/>
+                </div>
               </div>
 
             </ng-template>
@@ -249,18 +278,16 @@
             <ng-template #content let-activateCallback="activateCallback">
 
               <div
-                class="max-w-xl mx-auto min-h-[30rem] flex flex-col"
-                enterClass="animate-enter fade-in-10 zoom-in-75 animate-duration-1000"
-                leaveClass="animate-leave fade-out-0"
-                pAnimateOnScroll>
+                [@fadeAnimation]
+                class="max-w-xl mx-auto min-h-[30rem] flex flex-col">
                 <app-loader *ngIf="loading"></app-loader>
                 <h3 class="text-left text-2xl fw-bold text-primary mt-4">🖼️ Médias</h3>
 
                 <form [formGroup]="mediaForm" class="flex flex-col gap-4">
                   <p-fileupload
-                    [customUpload]="true"
                     (onSelect)="onSelect($event)"
                     (onUpload)="onUpload($event)"
+                    [customUpload]="true"
                     [multiple]="true"
                     accept="image/*"
                     cancelLabel="Annuler"
@@ -289,19 +316,20 @@
           <!-- Étape 5 : Confirmation -->
           <p-step-panel [value]="5">
             <ng-template #content let-activateCallback="activateCallback">
-              <div class="max-w-md mx-auto min-h-[18rem] flex flex-col items-center justify-center ">
+              <div [@fadeAnimation]
+                   class="max-w-md mx-auto min-h-[18rem] flex flex-col items-center justify-center ">
                 <h3 class="text-2xl font-bold text-green-600 ">✅ Restaurant créé avec succès</h3>
                 <img alt="confirmation" class="mt-4 w-40"
                      src="https://primefaces.org/cdn/primeng/images/stepper/content.svg"/>
               </div>
               <div class="flex justify-center pt-3">
-                <p-button (onClick)="resetForms()" icon="pi pi-plus" label="Nouveau resto"
-                          severity="primary" [routerLink]="['/add-canteen']"/>
+                <p-button (onClick)="resetForms()" [routerLink]="['/add-canteen']" icon="pi pi-plus"
+                          label="Nouveau resto" severity="primary"/>
               </div>
 
               <div class="flex justify-center pt-3 ">
-                <p-button (onClick)="resetForms()" icon="pi pi-plus" label="Liste des restos" severity="primary"
-                          [routerLink]="['/canteen-list']"/>
+                <p-button (onClick)="resetForms()" [routerLink]="['/canteen-list']" icon="pi pi-plus" label="Liste des restos"
+                          severity="primary"/>
               </div>
 
 

@@ -1,7 +1,6 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {NavbarTop} from '../../../../_core/layout/navbar-top/navbar-top';
 import {Step, StepList, StepPanel, StepPanels, Stepper} from 'primeng/stepper';
-import {AnimateOnScroll} from 'primeng/animateonscroll';
 import {FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Button} from 'primeng/button';
 import {GalleriaModule} from 'primeng/galleria';
@@ -10,7 +9,7 @@ import {Textarea} from 'primeng/textarea';
 import {CanteenService} from '../../../../_core/services/canteen-service';
 import {AlertService} from '../../../../_core/services/alert-service';
 import {AuthService} from '../../../../_core/services/auth-service';
-import {Canteen} from '../../../../_core/models/canteen';
+import {Canteen, DayOfWeek} from '../../../../_core/models/canteen';
 import {TableModule} from 'primeng/table';
 import {DatePicker} from 'primeng/datepicker';
 import {PickList, PickListModule} from 'primeng/picklist';
@@ -19,24 +18,36 @@ import {ParamService} from '../../../../_core/services/param-service';
 import {FileSelectEvent, FileUpload} from 'primeng/fileupload';
 import {Loader} from '../../../../_core/layout/loader/loader';
 import {RouterLink} from '@angular/router';
-import {AddCanteen, DayOfWeek, OpeningHours} from '../../../../_core/dto/addCanteen';
+import {AddCanteen} from '../../../../_core/dto/addCanteen';
 import {Location} from '../../../../_core/dto/location';
 import {Select} from 'primeng/select';
 import {AutoFocus} from 'primeng/autofocus';
 import {CommonModule} from '@angular/common';
 import {AsideMenuComponent} from '../../../../_core/layout/aside-menu-component/aside-menu-component';
+import {animate, style, transition, trigger} from '@angular/animations';
+import {KeyFilter} from 'primeng/keyfilter';
 
 
-const dayMap: { [key: string]: DayOfWeek } = {
-  Lundi: DayOfWeek.Monday,
-  Mardi: DayOfWeek.Tuesday,
-  Mercredi: DayOfWeek.Wednesday,
-  Jeudi: DayOfWeek.Thursday,
-  Vendredi: DayOfWeek.Friday,
-  Samedi: DayOfWeek.Saturday,
-  Dimanche: DayOfWeek.Sunday,
+
+export const dayDisplayMap: Record<DayOfWeek, string> = {
+  [DayOfWeek.MONDAY]: 'Lundi',
+  [DayOfWeek.TUESDAY]: 'Mardi',
+  [DayOfWeek.WEDNESDAY]: 'Mercredi',
+  [DayOfWeek.THURSDAY]: 'Jeudi',
+  [DayOfWeek.FRIDAY]: 'Vendredi',
+  [DayOfWeek.SATURDAY]: 'Samedi',
+  [DayOfWeek.SUNDAY]: 'Dimanche'
 };
 
+const dayMap: Record<string, DayOfWeek> = {
+  'Lundi': DayOfWeek.MONDAY,
+  'Mardi': DayOfWeek.TUESDAY,
+  'Mercredi': DayOfWeek.WEDNESDAY,
+  'Jeudi': DayOfWeek.THURSDAY,
+  'Vendredi': DayOfWeek.FRIDAY,
+  'Samedi': DayOfWeek.SATURDAY,
+  'Dimanche': DayOfWeek.SUNDAY,
+};
 
 
 @Component({
@@ -51,7 +62,6 @@ const dayMap: { [key: string]: DayOfWeek } = {
     GalleriaModule,
     StepPanel,
     StepPanels,
-    AnimateOnScroll,
     Button,
     InputText,
     Textarea,
@@ -64,10 +74,22 @@ const dayMap: { [key: string]: DayOfWeek } = {
     Select,
     AutoFocus,
     AsideMenuComponent,
+    KeyFilter,
   ],
   templateUrl: './add-canteen-component.html',
   standalone: true,
-  styleUrl: './add-canteen-component.css'
+  styleUrl: './add-canteen-component.css',
+  animations:[
+    trigger('fadeAnimation',[
+      transition(':enter',[
+        style({opacity:0}),
+        animate('300ms ease-out', style({opacity: 1}))
+      ]),
+      transition(':leave',[
+        animate('300ms ease-in', style({opacity: 0 }))
+      ])
+    ])
+  ]
 })
 export class AddCanteenComponent implements OnInit {
 
@@ -120,8 +142,8 @@ export class AddCanteenComponent implements OnInit {
         this.daysOfWeek.map((day) =>
           this.formBuilder.group({
             day: [day],
-            opening: ['11:00'],
-            closing: ['22:00'],
+            open: ['11:00'],
+            close: ['22:00'],
             isClosed: [false],
           })
         )
@@ -149,7 +171,8 @@ export class AddCanteenComponent implements OnInit {
     });
 
     this.servicesForm = this.formBuilder.group({
-      selectedServices: [[],Validators.required]
+      selectedServices: [[],Validators.required],
+      room: new FormControl('',Validators.required),
     })
 
     this.mediaForm = this.formBuilder.group({
@@ -233,16 +256,17 @@ export class AddCanteenComponent implements OnInit {
 
   // Final submission
   onSubmit() {
-    const openingHoursMap = new Map<DayOfWeek, OpeningHours>();
+    const openingHoursMap: Record<string, any> = {};
 
     this.daysArray.value.forEach((dayGroup: any) => {
       if (!dayGroup.isClosed) {
         const enumDay = dayMap[dayGroup.day];
         if (enumDay) {
-          openingHoursMap.set(enumDay, {
-            openingTime: dayGroup.opening,
-            closeTime: dayGroup.closing,
-          });
+
+          openingHoursMap[enumDay] = {
+            open: dayGroup.open,
+            close: dayGroup.close,
+          };
         }
       }
     });
@@ -255,7 +279,7 @@ export class AddCanteenComponent implements OnInit {
         phone: this.infoForm.get('phone')?.value,
       },
       equipments: this.targetServices.map(s => s.label),
-      meetingRooms: 0,
+      meetingRooms: this.servicesForm.get('room')?.value,
       openingHoursMap: openingHoursMap,
       location: {
         address: this.infoForm.value.address,
@@ -267,6 +291,8 @@ export class AddCanteenComponent implements OnInit {
       userId: this.authService.getUserId()?.toString()
     };
 
+
+    console.log("before ading : ",canteenData)
 
     const files = this.mediaForm.get('pictures')?.value || [];
 
@@ -293,6 +319,12 @@ export class AddCanteenComponent implements OnInit {
     this.selectedCanteen = undefined!;
     this.images = [];
     this.activeStep = 1;
+  }
+
+  getOpeningHours(day: string) {
+    if (!this.selectedCanteen) return undefined;
+    const enumDay = dayMap[day] as keyof typeof this.selectedCanteen.openingHoursMap;
+    return this.selectedCanteen.openingHoursMap[enumDay];
   }
 
 }
