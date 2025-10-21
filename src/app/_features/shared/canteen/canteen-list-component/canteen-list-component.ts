@@ -5,7 +5,7 @@ import {InputText} from 'primeng/inputtext';
 import {NavbarTop} from '../../../../_core/layout/navbar-top/navbar-top';
 import {CanteenService} from '../../../../_core/services/canteen-service';
 import {CommonModule} from '@angular/common';
-import {Canteen} from '../../../../_core/models/canteen';
+import {Canteen, DayOfWeek, OpeningHours} from '../../../../_core/models/canteen';
 import {AlertService} from '../../../../_core/services/alert-service';
 import {ResponseWrapper} from '../../../../_core/dto/responseWrapper';
 import {TableModule} from 'primeng/table';
@@ -18,6 +18,13 @@ import {ParamService, SelectCanteen} from '../../../../_core/services/param-serv
 import {AutoComplete, AutoCompleteCompleteEvent} from 'primeng/autocomplete';
 import {AutoFocus} from 'primeng/autofocus';
 import {AsideMenuComponent} from '../../../../_core/layout/aside-menu-component/aside-menu-component';
+import {Dialog} from 'primeng/dialog';
+import {Image} from 'primeng/image';
+import {EventStatus} from '../../../../_core/models/eventStatus';
+import {AuthService} from '../../../../_core/services/auth-service';
+
+
+
 
 
 @Component({
@@ -32,10 +39,12 @@ import {AsideMenuComponent} from '../../../../_core/layout/aside-menu-component/
     TableModule,
     InputNumber,
     Loader,
-    Button,
     AutoComplete,
     AutoFocus,
     AsideMenuComponent,
+    Dialog,
+    Image,
+    Button,
   ],
   templateUrl: './canteen-list-component.html',
   standalone: true,
@@ -54,9 +63,29 @@ export class CanteenListComponent implements OnInit{
   visible: boolean =  false ;
   isLoading= false;
 
+  daysOfWeek = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+  dayMap: Record<string, DayOfWeek> = {
+    'Lundi': DayOfWeek.MONDAY,
+    'Mardi': DayOfWeek.TUESDAY,
+    'Mercredi': DayOfWeek.WEDNESDAY,
+    'Jeudi': DayOfWeek.THURSDAY,
+    'Vendredi': DayOfWeek.FRIDAY,
+    'Samedi': DayOfWeek.SATURDAY,
+    'Dimanche': DayOfWeek.SUNDAY,
+  };
+
+  getOpeningHours(day: string): OpeningHours | undefined {
+    if (!this.selectedCanteen || !this.selectedCanteen.openingHoursMap) return undefined;
+
+    const dayEnum = this.dayMap[day]; // ex: "MONDAY"
+    return this.selectedCanteen.openingHoursMap[dayEnum];
+  }
+
+
   constructor(protected canteenService: CanteenService,
               protected alertService: AlertService,
-              protected  paramService: ParamService) {
+              protected  paramService: ParamService,
+              protected authService: AuthService) {
   }
 
   ngOnInit(): void {
@@ -69,11 +98,12 @@ export class CanteenListComponent implements OnInit{
 
   loadCanteens() {
     this.isLoading = true;
-    this.canteenService.loadCanteens()
+    this.canteenService.loadCanteens(this.canteenService.canteenFilter)
       .subscribe({
         next: (res: ResponseWrapper<Canteen[]>) => {
           this.canteens = res.data;
           this.isLoading = false;
+          console.log(res.data);
         },
         error: (err: any) => {
           console.log(`Error http when fetching canteens : ${err}`);
@@ -135,6 +165,16 @@ export class CanteenListComponent implements OnInit{
 
 
   showDialog(canteen: Canteen) {
+    this.selectedCanteen = canteen;
+    this.visible = true;
+  }
+
+
+  updateApproval(selectedCanteen: Canteen | null, rejected: string) {
+
+  }
+
+  deleteCanteen(selectedCanteen: Canteen | null) {
 
   }
 }

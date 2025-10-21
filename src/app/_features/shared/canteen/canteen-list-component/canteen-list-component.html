@@ -40,14 +40,14 @@
                     <label class="form-label fw-bold">Nom du resto</label>
                   </div>
                   <p-autoComplete
-                    [(ngModel)]="canteenService.canteenFilter.name"
-                    [suggestions]="filteredCanteen"
-                    optionValue="id"
-                    optionLabel="name"
                     (completeMethod)="search($event)"
+                    [(ngModel)]="canteenService.canteenFilter.name"
+                    [fluid]="true"
                     [ngModelOptions]="{standalone: true}"
+                    [pAutoFocus]="true"
+                    [suggestions]="filteredCanteen"
                     autocomplete="off"
-                    [pAutoFocus]="true" [fluid]="true"
+                    optionLabel="name" optionValue="id"
                   ></p-autoComplete>
                 </div>
 
@@ -57,11 +57,11 @@
                   </div>
                   <input
                     [(ngModel)]="canteenService.canteenFilter.address"
+                    [fluid]="true"
                     [ngModelOptions]="{standalone: true}"
+                    [pAutoFocus]="true"
                     autocomplete="off"
-                    pInputText
-                    type="text"
-                    [pAutoFocus]="true" [fluid]="true"
+                    pInputText type="text"
                   />
                 </div>
 
@@ -71,14 +71,14 @@
                   </div>
                   <p-multiselect
                     [(ngModel)]="canteenService.canteenFilter.services"
+                    [fluid]="true"
                     [maxSelectedLabels]="1"
                     [ngModelOptions]="{standalone: true}"
                     [options]="this.serviceParams"
-                    optionLabel="label"
-                    optionValue="value"
+                    [pAutoFocus]="true"
                     class="w-full md:w-80"
-                    placeholder="Selectionner un service"
-                    [pAutoFocus]="true" [fluid]="true"
+                    optionLabel="label"
+                    optionValue="value" placeholder="Selectionner un service"
                   >
                   </p-multiselect>
                 </div>
@@ -89,11 +89,11 @@
                   </div>
                   <input
                     [(ngModel)]="canteenService.canteenFilter.restorer"
+                    [fluid]="true"
                     [ngModelOptions]="{standalone: true}"
+                    [pAutoFocus]="true"
                     autocomplete="off"
-                    pInputText
-                    type="text"
-                    [pAutoFocus]="true" [fluid]="true"
+                    pInputText type="text"
                   />
                 </div>
 
@@ -106,11 +106,11 @@
                   </div>
                   <p-inputnumber
                     [(ngModel)]="canteenService.canteenFilter.seats"
+                    [fluid]="true"
                     [ngModelOptions]="{standalone: true}"
+                    [pAutoFocus]="true"
                     [showButtons]="true"
-                    inputId="stacked"
-                    mode="decimal"
-                    [pAutoFocus]="true" [fluid]="true"
+                    inputId="stacked" mode="decimal"
                   ></p-inputnumber>
                 </div>
 
@@ -136,11 +136,11 @@
                   </div>
                   <p-datepicker
                     [(ngModel)]="canteenService.canteenFilter.endOpeningHour"
+                    [fluid]="true"
                     [ngModelOptions]="{standalone: true}"
+                    [pAutoFocus]="true"
                     [showIcon]="true"
-                    [showOnFocus]="false"
-                    inputId="buttondisplay"
-                    [pAutoFocus]="true" [fluid]="true"
+                    [showOnFocus]="false" inputId="buttondisplay"
                   >
                   </p-datepicker>
                 </div>
@@ -151,22 +151,22 @@
                   </div>
                   <p-multiselect
                     [(ngModel)]="canteenService.canteenFilter.status"
+                    [fluid]="true"
                     [maxSelectedLabels]="1"
                     [ngModelOptions]="{standalone: true}"
                     [options]="this.statusParams"
-                    optionLabel="label"
-                    optionValue="value"
+                    [pAutoFocus]="true"
                     class="w-full md:w-80"
                     id="status"
-                    placeholder="Selectionner un status"
-                    [pAutoFocus]="true" [fluid]="true"
+                    optionLabel="label"
+                    optionValue="value" placeholder="Selectionner un status"
                   ></p-multiselect>
                 </div>
               </div>
 
               <div class="row py-3">
                 <div class="col-lg-4 col-md-6 col-12">
-                  <button class="btn btn-primary " type="button">Rechercher</button>
+                  <button (click)="loadCanteens()" class="btn btn-primary " type="button">Rechercher</button>
                 </div>
               </div>
             </form>
@@ -189,91 +189,229 @@
 
             <div class="container-fluid py-2">
               <div class="row g-4">
-                <div *ngFor="let canteen of canteens" class="col-12 col-sm-6 col-md-4 col-lg-3">
-                  <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden"
-                       style="border: 10px solid #e0e0e0; transition: transform 0.2s, box-shadow 0.2s;">
+                <div *ngIf="canteens?.length; else noCanteen" class="row g-4">
+                  <div *ngFor="let canteen of canteens" class="col-12 col-sm-6 col-md-4 col-lg-3">
+                    <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden"
+                         style="border: 10px solid #e0e0e0; transition: transform 0.2s, box-shadow 0.2s;">
 
-                    <!-- Image principale -->
-                    <div class="position-relative" style="height: 180px; overflow: hidden;">
-                      <img [alt]="canteen.name"
-                           [src]="canteen.pictures[0] || 'https://via.placeholder.com/400x200'"
-                           class="card-img-top"
-                           style="height: 100%; width: 100%; object-fit: cover;"/>
+                      <!-- Image principale -->
+                      <div class="position-relative" style="height: 180px; overflow: hidden;">
+                        <img [alt]="canteen.name"
+                             [src]="canteen.pictures[0] || 'https://via.placeholder.com/400x200'"
+                             class="card-img-top"
+                             style="height: 100%; width: 100%; object-fit: cover;"/>
 
-                      <!-- Overlay dégradé -->
-                      <div class="position-absolute top-0 start-0 w-100 h-100"
-                           style="background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7))"></div>
+                        <!-- Overlay dégradé -->
+                        <div class="position-absolute top-0 start-0 w-100 h-100"
+                             style="background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7))"></div>
 
-                      <!-- Nom -->
-                      <h5 class="position-absolute bottom-0 start-0 text-white fw-bold px-3 pb-2 m-0 text-truncate"
-                          style="max-width: 90%; font-size: 1rem;">
-                        {{ canteen.name }}
-                      </h5>
+                        <!-- Nom -->
+                        <h5 class="position-absolute bottom-0 start-0 text-white fw-bold px-3 pb-2 m-0 text-truncate"
+                            style="max-width: 90%; font-size: 1rem;">
+                          {{ canteen.name }}
+                        </h5>
+                      </div>
+
+                      <!-- Corps de la carte -->
+                      <div class="card-body d-flex flex-column p-3">
+
+                        <!-- Description -->
+                        <p class="text-muted mb-2"
+                           style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.9rem; min-height: 2.4em;">
+                          {{ canteen.desc }}
+                        </p>
+
+                        <!-- Localisation -->
+                        <div class="align-items-center mb-1 text-muted"
+                             style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;text-overflow: ellipsis;font-size: 0.85rem;">
+                          <i class="pi pi-map-marker text-danger me-2"></i>
+                          <span>{{ canteen.location.address }}, {{ canteen.location.city }}</span>
+                        </div>
+
+                        <!-- Contact -->
+                        <div class="d-flex align-items-center mb-1 text-muted" style="font-size: 0.85rem;">
+                          <i class="pi pi-phone text-primary me-2"></i>
+                          <span>{{ canteen.contact.phone || 'Non renseigné' }}</span>
+                        </div>
+
+                        <!-- Équipements -->
+                        <div class="mb-2">
+                          <i class="pi pi-cog text-success me-2"></i>
+                          <span class="small text-muted">{{ canteen.equipments.join(', ') }}</span>
+                        </div>
+
+                        <!-- Statut d'approbation -->
+
+                        <!-- Sièges et salles -->
+
+                        <!-- Bouton Voir -->
+
+                        <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+                          <div class="">
+                          <span *ngIf="canteen.approval.status"
+                                [ngClass]="{
+                              'bg-warning text-dark': canteen.approval.status === 'PENDING',
+                              'bg-success': canteen.approval.status === 'APPROVED',
+                              'bbg-danger': canteen.approval.status === 'REJECTED'
+                              }" class="badge rounded-pill px-3 py-1">
+                            {{ canteen.approval.status || 'Non défini' }}
+                          </span>
+                          </div>
+
+                          <div class="">
+                            <p-button (click)="showDialog(canteen)"
+                                      icon="pi pi-search"
+                                      label="Voir"
+                                      size="small"
+                                      styleClass="p-button-sm p-button-outlined p-button-primary">
+                            </p-button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
-                    <!-- Corps de la carte -->
-                    <div class="card-body d-flex flex-column p-3">
-
-                      <!-- Description -->
-                      <p class="text-muted mb-2"
-                         style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 0.9rem;">
-                        {{ canteen.desc }}
-                      </p>
-
-                      <!-- Localisation -->
-                      <div class="d-flex align-items-center mb-1 text-muted" style="font-size: 0.85rem;">
-                        <i class="pi pi-map-marker text-danger me-2"></i>
-                        <span>{{ canteen.location.address }}, {{ canteen.location.city }}</span>
-                      </div>
-
-                      <!-- Contact -->
-                      <div class="d-flex align-items-center mb-1 text-muted" style="font-size: 0.85rem;">
-                        <i class="pi pi-phone text-primary me-2"></i>
-                        <span>{{ canteen.contact.phone || 'Non renseigné'}}</span>
-                      </div>
-
-                      <!-- Équipements -->
-                      <div class="mb-2">
-                        <i class="pi pi-cog text-success me-2"></i>
-                        <span class="small text-muted">{{ canteen.equipments.join(', ') }}</span>
-                      </div>
-
-                      <!-- Sièges et salles -->
-                      <div class="d-flex align-items-center justify-content-between mb-2">
-                  <span
-                    class="badge bg-primary bg-opacity-10 text-primary border border-primary rounded-pill px-3 py-1">
-                    <i class="pi pi-users me-1"></i> {{ canteen.seats }} places
-                  </span>
-                        <span
-                          class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-3 py-1">
-                    <i class="pi pi-briefcase me-1"></i> {{ canteen.meetingRooms }} salles
-                  </span>
-
-                        <!--
-                        <span>
-                           <p-button (click)="showDialog(canteen)" icon="pi pi-search" label="Voir" size="small" styleClass="p-button-sm p-button-outlined p-button-primary"></p-button>
-                        </span>-->
-                      </div>
-
-                      <!-- Bouton Voir -->
-                      <div class="mt-auto d-flex justify-content-end">
-                        <p-button (click)="showDialog(canteen)"
-                                  icon="pi pi-search"
-                                  label="Voir"
-                                  size="small"
-                                  styleClass="p-button-sm p-button-outlined p-button-primary">
-                        </p-button>
-                      </div>
-
-                    </div>
                   </div>
-
                 </div>
+
+                <ng-template #noCanteen>
+                  <div class="flex flex-col items-center justify-center py-12 text-center text-gray-600">
+                    <h3 class="text-lg font-medium mb-2">Aucun restaurant trouvé</h3>
+                    <p class="text-sm">Vous n’avez encore ajouté aucun restaurant ou aucun résultat ne correspond à
+                      votre recherche.</p>
+                  </div>
+                </ng-template>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+
+      <p-dialog
+        [(visible)]="visible"
+        [closable]="true"
+        [contentStyle]="{ 'max-height': '80vh', 'overflow-y': 'auto', 'padding': '1.5rem' }"
+        [dismissableMask]="true"
+        [modal]="true"
+        [style]="{ width: '55rem', maxWidth: '95vw' }"
+        header="Détails du restaurant"
+        styleClass="p-0">
+
+        <ng-container *ngIf="selectedCanteen">
+
+          <!-- Images -->
+          <div class="d-flex flex-wrap gap-3 justify-content-center mb-4">
+            <p-image *ngFor="let img of selectedCanteen.pictures"
+                     [preview]="true"
+                     [src]="img || 'https://via.placeholder.com/250x200'"
+                     alt="Image de l'événement"
+                     class="shadow-sm border rounded-3"
+                     height="150"
+                     width="220">
+            </p-image>
+          </div>
+
+          <!-- Titre + Description -->
+          <div class="text-center mb-4 px-3">
+            <h3 class="fw-bold text-primary mb-2">{{ selectedCanteen.name }}</h3>
+            <p class="text-muted fs-6 mb-0">{{ selectedCanteen.desc }}</p>
+          </div>
+
+          <!-- Infos principales -->
+          <div class="row g-4">
+
+            <!-- Adresse -->
+            <div class="col-md-6">
+              <div class="card shadow-sm border rounded-3 h-100">
+                <div class="card-body d-flex align-items-center">
+                  <i class="pi pi-map-marker text-danger fs-3 me-3"></i>
+                  <div>
+                    <h6 class="fw-bold mb-1">Adresse</h6>
+                    <p class="m-0 small text-muted text-truncate">
+                      {{ selectedCanteen.location.address }}, {{ selectedCanteen.location.city }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contact -->
+            <div class="col-md-6">
+              <div class="card shadow-sm border rounded-3 h-100">
+                <div class="card-body d-flex align-items-center">
+                  <i class="pi pi-phone text-primary fs-3 me-3"></i>
+                  <div>
+                    <h6 class="fw-bold mb-1">Contact</h6>
+                    <p class="m-0 small text-muted">
+                      {{ selectedCanteen.contact.phone }} <br>
+                      {{ selectedCanteen.contact.email }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Équipements -->
+            <div class="col-md-6" *ngIf="selectedCanteen.equipments?.length">
+              <div class="card shadow-sm border rounded-3 h-100">
+                <div class="card-body">
+                  <h6 class="fw-bold mb-2">Équipements</h6>
+                  <div class="d-flex gap-2 flex-wrap">
+              <span *ngFor="let eq of selectedCanteen.equipments"
+                    class="badge bg-secondary rounded-pill px-3 py-1">
+                {{ eq }}
+              </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Horaires -->
+            <div class="col-md-6" *ngIf="selectedCanteen.openingHoursMap">
+              <div class="card shadow-sm border rounded-3 h-100">
+                <div class="card-body">
+                  <h6 class="fw-bold mb-2">Horaires</h6>
+                  <div style="max-height: 50px; overflow-y: auto;">
+                  <div *ngFor="let day of daysOfWeek" class="d-flex justify-content-between small text-muted mb-1">
+                    <span>{{ day }}</span>
+                    <span>
+                      <ng-container *ngIf="getOpeningHours(day) as hours; else closed">
+                        {{ hours.open }} - {{ hours.close }}
+                      </ng-container>
+                      <ng-template #closed>Fermé</ng-template>
+                    </span>
+                  </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </ng-container>
+
+        <!-- Footer -->
+        <ng-template pTemplate="footer"  *ngIf="authService.isAdmin()" >
+          <div class="d-flex justify-content-end gap-2">
+            <p-button (click)="visible = false" icon="pi pi-times" label="Fermer" severity="secondary"
+                      size="small"/>
+            <p-button (click)="updateApproval(selectedCanteen, 'REJECTED')" icon="pi pi-times-circle" label="Refuser"
+                      severity="danger" size="small"/>
+            <p-button *ngIf="authService.isAdmin()" (click)="updateApproval(selectedCanteen, 'APPROVED')" icon="pi pi-check-circle" label="Valider"
+                      severity="success" size="small"/>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="footer"  *ngIf="authService.isRestorer()" >
+          <div class="d-flex justify-content-end gap-2">
+            <p-button (click)="visible = false" icon="pi pi-times" label="Fermer" severity="secondary"
+                      size="small"/>
+                      severity="success" size="small"/>
+            <p-button (click)="deleteCanteen(selectedCanteen)" icon="pi pi-trash" label="Supprimer" severity="danger" size="small"></p-button>
+          </div>
+        </ng-template>
+
+      </p-dialog>
+
     </main>
   </div>
 </div>
