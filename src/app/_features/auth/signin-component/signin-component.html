@@ -2,7 +2,6 @@
 <html lang="fr">
 
 <head>
-  <meta charset="utf-8">
   <title></title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,7 +14,7 @@
     <div class="container">
       <a class="navbar-brand text-uppercase" href="index.html">Veg'N'Bio</a>
       <div class="collapse navbar-collapse" id="navbars">
-        <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+        <!--<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
           <li class="nav-item active">
             <a class="nav-link fw-bolder">Accueil</a>
           </li>
@@ -27,7 +26,7 @@
         <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
           <li><a class="nav-link" href="#"><img src="" alt=""></a></li>
           <li><a class="nav-link" href=""><img src="" alt=""></a></li>
-        </ul>
+        </ul>-->
       </div>
     </div>
   </nav>
@@ -43,42 +42,28 @@
   <div class="d-flex justify-content-center align-items-center " style="margin-top: 15vh">
     <div>
       <h5 class="card-title text-center text-uppercase mb-5 fw-bold fs-5">Authentification</h5>
-      <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
+      <form [formGroup]="signinForm" (ngSubmit)="onSubmit()">
         <div class="row">
           <div class="col-md">
-            <label for="username" class="form-label  mb-0">Login</label>
-            <input id="username"
-                   class="form-label mb-0 w-100 mb-3"
-                   type="text" pInputText
-                   formControlName="username"
-                   pSize="small"
-                   autocomplete="off"
-                   placeholder="Nom utilisateur"/>
+            <label for="username" class="form-label">Login</label>
+            <input id="username" class="form-label w-100 mb-3" type="text" pInputText formControlName="username" pSize="small" autocomplete="off" placeholder="Nom utilisateur" [pAutoFocus]="true" [fluid]="true"/>
           </div>
         </div>
         <div class="row">
           <div class="col-md">
-            <label for="password" class="form-label  mb-0">Mot de passe</label>
-            <input id="password"
-                   class="form-label mb-0 w-100"
-                   type="password"
-                   pInputText
-                   formControlName="password"
-                   pSize="small"
-                   autocomplete="new-password"
-                   placeholder="Mot de passe"/>
+            <label for="password" class="form-label">Mot de passe</label>
+            <input id="password" class="form-label w-100 mb-3" type="password" pInputText formControlName="password" pSize="small" autocomplete="new-password" placeholder="Mot de passe" [pAutoFocus]="true" [fluid]="true"/>
           </div>
         </div>
 
-        <div class="row pt-2">
-          <div class="md text-end " style="font-size: 0.75rem">
-            <a href="/forgot-password" class="link-danger text-decoration-none"> Mot de passe oublié</a>
-          </div>
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center pt-2">
+          <a href="/signup" class="link-danger text-decoration-none" style="font-size: 0.80rem;"> Compte restaurateur</a>
+          <a href="/forgot-password" class="link-danger text-decoration-none" style="font-size: 0.80rem;"> Mot de passe oublié</a>
         </div>
 
         <div class="d-flex justify-content-center align-items-center ">
           <button type="submit" class="btn btn-danger  fw-bolder mt-3"
-                  [disabled]="myForm.invalid || this.authService.isLoading">Se connecter
+                  [disabled]="signinForm.invalid || this.authService.isLoading">Se connecter
           </button>
         </div>
       </form>
