@@ -1,4 +1,4 @@
-import {ERole} from './ERole';
+import {ERole} from './eRole';
 
 
 export interface Role {

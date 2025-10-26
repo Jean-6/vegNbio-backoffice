@@ -1,7 +1,6 @@
-import {Approval} from './approval';
-import {EventStatus} from '../models/eventStatus';
-import {EventType} from './eventTytpe';
+import {EventStatus} from './eventStatus';
 import {Location} from './location';
+import {Approval} from './canteen';
 
 
 export interface Event {
@@ -17,6 +16,42 @@ export interface Event {
   status: EventStatus;
   pictures: string [];
   participantsIds: string[];
+
   approval: Approval;
   createdAt: Date;
 }
+
+
+
+export class EventFilter {
+
+  name?: string ;
+  canteenName?: string ;
+  organizer?: string[] ;
+  startDate?: Date ;
+  endDate?: Date ;
+  seats?: number ;
+  type?: string ; //Prive public communautaire
+  status?: string ; // A venir , en cours , annulé
+}
+
+
+
+export enum EventType {
+  Degustation = "Degustation",
+  Atelier = "Atelier",
+  Conference = "Conference",
+}
+
+
+export interface AddEvent{
+  canteenId: string;
+  title: string;
+  desc: string;
+  type: EventType;
+  startTime: string;
+  endTime: string;
+  date: string;
+  userId: string;
+}
+

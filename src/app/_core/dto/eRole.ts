@@ -1,0 +1,7 @@
+
+export enum ERole {
+  ADMIN = 'ADMIN',
+  RESTORER = 'RESTORER',
+  SUPPLIER = 'SUPPLIER',
+  CUSTOMER = 'CUSTOMER'
+}

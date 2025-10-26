@@ -53,3 +53,41 @@ export interface Approval{
   reasons?: String ;
 
 }
+export interface CanteenFilter {
+  name?: string ;
+  address?: string ;
+  services?: string[] ;
+  seats?: number ;
+  startOpeningHour?: Date;
+  endOpeningHour?: Date;
+  restorer?: string ;
+  status?: string ; //Actif - Ferme temporairement - Supprime
+}
+
+
+export interface CanteenInfo {
+
+  name:string;
+  location:Location;
+  contact:Contact;
+}
+
+
+
+export interface Contact{
+  email: string;
+  phone: string;
+}
+
+
+export interface AddCanteen{
+  name: string;
+  contact: Contact;
+  desc: string;
+  equipments: string[];
+  meetingRooms: number;
+  openingHoursMap: Record<string, OpeningHours> ;
+  location: Location;
+  tags: string[];
+  userId: string;
+}

@@ -1,4 +1,4 @@
-import {Role} from '../models/Role';
+import {Role} from './Role';
 
 
 export interface LoginResponse {
@@ -6,7 +6,9 @@ export interface LoginResponse {
   username?: string;
   email?: string;
   roles?: Role[];
-  accessToken?: string;
+  token?: string;
   refreshToken?: string;
+  isActive : boolean;
+  isVerified:boolean;
   tokenType?: string;
 }

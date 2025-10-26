@@ -1,10 +1,8 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable, throwError} from 'rxjs';
 import {ResponseWrapper} from '../dto/responseWrapper';
-import {CanteenFilter} from '../dto/canteenFilter';
-import {Approval, Canteen} from '../dto/canteen';
-import {AddCanteen} from '../dto/addCanteen';
+import {AddCanteen, Approval, Canteen, CanteenFilter} from '../dto/canteen';
 import {AuthService} from './auth-service';
 import {environment} from '../../../environments/environment';
 
@@ -14,6 +12,7 @@ import {environment} from '../../../environments/environment';
   providedIn: 'root'
 })
 export class CanteenService {
+
 
 
   canteenFilter: CanteenFilter ={} ;

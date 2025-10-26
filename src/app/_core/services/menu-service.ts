@@ -1,18 +1,22 @@
 import { Injectable } from '@angular/core';
-import {EventFilter} from '../dto/eventFilter';
-import {HttpClient} from '@angular/common/http';
-import {AddMenuItem} from '../dto/addMenuItem';
-import {Observable} from 'rxjs';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {Observable, throwError} from 'rxjs';
 import {ResponseWrapper} from '../dto/responseWrapper';
+import {AddMenuItem, MenuItem, MenuItemFilter} from '../dto/menuItem';
+import {AuthService} from './auth-service';
+import {environment} from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MenuService {
 
-  private apiUrlMenu ="http://localhost:8082/api/menu";
 
-  constructor(private http: HttpClient) {}
+  itemMenuFilter: MenuItemFilter ={} ;
+  private baseUrl = `${environment.apiUrl}`;
+
+  constructor(private http: HttpClient,
+              private authService: AuthService) {}
 
 
   saveItemMenuWithPictures( menuItem: AddMenuItem, pictures: File[]): Observable<ResponseWrapper<any>> {
@@ -27,10 +31,33 @@ export class MenuService {
 
     // Envoyer le POST
     return this.http.post<ResponseWrapper<any>>(
-      `${this.apiUrlMenu}/`,
+      `${this.baseUrl}/api/menu/`,
       formData
     );
 
   }
+
+
+  getItemsMenu(filter?:MenuItemFilter): Observable<ResponseWrapper<MenuItem[]>> {
+    let params = new HttpParams();
+    if (filter) {
+      Object.entries(filter).forEach(([key, value]) => {
+        if (value ! == undefined && value !== null && value !== '') {
+          params = params.set(key, value.toString());
+        }
+      });
+    }
+
+    if (this.authService.isAdmin()) {
+      return this.http.get<ResponseWrapper<MenuItem[]>>(`${this.baseUrl}/api/menu`, {params});
+    }
+
+    if (this.authService.isRestorer()) {
+      return this.http.get<ResponseWrapper<MenuItem[]>>(`${this.baseUrl}/api/menu/me`,  {params});
+
+    }
+    return throwError(() => new Error('Accès non autorisé'));
+  }
+
 
 }
