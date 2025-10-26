@@ -5,7 +5,7 @@ import {InputText} from 'primeng/inputtext';
 import {NavbarTop} from '../../../../_core/layout/navbar-top/navbar-top';
 import {CanteenService} from '../../../../_core/services/canteen-service';
 import {CommonModule} from '@angular/common';
-import {Canteen, DayOfWeek, OpeningHours} from '../../../../_core/models/canteen';
+import {Canteen, DayOfWeek, OpeningHours, Status} from '../../../../_core/dto/canteen';
 import {AlertService} from '../../../../_core/services/alert-service';
 import {ResponseWrapper} from '../../../../_core/dto/responseWrapper';
 import {TableModule} from 'primeng/table';
@@ -20,11 +20,7 @@ import {AutoFocus} from 'primeng/autofocus';
 import {AsideMenuComponent} from '../../../../_core/layout/aside-menu-component/aside-menu-component';
 import {Dialog} from 'primeng/dialog';
 import {Image} from 'primeng/image';
-import {EventStatus} from '../../../../_core/models/eventStatus';
 import {AuthService} from '../../../../_core/services/auth-service';
-
-
-
 
 
 @Component({
@@ -165,16 +161,77 @@ export class CanteenListComponent implements OnInit{
 
 
   showDialog(canteen: Canteen) {
+    this.isLoading = true;
+    if(!canteen) return
     this.selectedCanteen = canteen;
     this.visible = true;
+    this.isLoading = false;
   }
 
 
-  updateApproval(selectedCanteen: Canteen | null, rejected: string) {
+  submitApproval(selectedCanteen: Canteen | null) {
+    this.isLoading = true;
+    if(!selectedCanteen) return;
+    this.canteenService
+      .approveOrReject(selectedCanteen.id, {status: Status.APPROVED})
+      .subscribe({
+        next:() =>{
+          this.isLoading =false
+          this.closeDialog()
+          this.alertService.success("Restaurant approuvé")
+          this.ngOnInit()
 
+        },
+        error:(err)=>{
+          console.error('Error when approving canteen:', err);
+          this.alertService.error(`Error when approving canteen: ${err}`);
+        }
+      })
+  }
+
+  submitReject(selectedCanteen: Canteen | null){
+    this.isLoading = true;
+    if(!selectedCanteen) return;
+    this.canteenService
+      .approveOrReject(selectedCanteen.id, {status: Status.REJECTED} )
+      .subscribe({
+        next:() =>{
+          this.isLoading =false;
+          this.closeDialog()
+          this.alertService.success("Approbation refusée");
+          this.ngOnInit()
+        },
+        error: (err)=>{
+          console.error('Error when rejecting canteen:', err);
+          this.alertService.error(`Error when rejecting canteen: ${err}`);
+        }
+      })
   }
 
   deleteCanteen(selectedCanteen: Canteen | null) {
+    this.isLoading = true;
+    if(!selectedCanteen) return;
+    this.canteenService
+      .delete(selectedCanteen.id )
+      .subscribe({
+        next:() =>{
+          this.isLoading =false;
+          this.closeDialog()
+          this.alertService.success("Restaurant supprimée avec succes");
+          this.ngOnInit()
+        },
+        error: (err)=>{
+          console.error('Error when deleting canteen:', err);
+          this.alertService.error(`Error when deleting canteen: ${err}`);
+        }
+      })
 
   }
+
+  closeDialog() {
+    this.visible = false;
+    this.selectedCanteen = null;
+  }
+
+  protected readonly Status = Status;
 }

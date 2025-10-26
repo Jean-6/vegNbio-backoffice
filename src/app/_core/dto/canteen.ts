@@ -1,6 +1,5 @@
 
-import {Location} from '../dto/location';
-import {Approval} from '../dto/approval';
+import {Location} from './location';
 
 export enum Status {
   PENDING = "PENDING",
@@ -47,4 +46,10 @@ export interface Canteen {
   pictures: string[];
   approval: Approval;
   createdAt: Date;
+}
+
+export interface Approval{
+  status ?: Status ;
+  reasons?: String ;
+
 }
