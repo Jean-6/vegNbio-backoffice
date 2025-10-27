@@ -15,7 +15,7 @@ export class CanteenService {
 
 
 
-  canteenFilter: CanteenFilter ={} ;
+  filters: CanteenFilter ={} ;
   private readonly baseUrl = `${environment.apiUrl}`;
   private readonly canteenEndpoint =`${this.baseUrl}/api/canteen`;
 
@@ -29,8 +29,14 @@ export class CanteenService {
     let params = new HttpParams();
     if (filter) {
       Object.entries(filter).forEach(([key, value]) => {
-        if (value ! == undefined && value !== null && value !== '') {
-          params = params.set(key, value.toString());
+        if (value !== undefined && value !== null && value !== '') {
+          if (Array.isArray(value)) {
+            value.forEach(v => {
+              params = params.append(key, v);
+            });
+          } else {
+            params = params.set(key, value.toString());
+          }
         }
       });
     }
@@ -80,4 +86,14 @@ export class CanteenService {
   delete(id: string): Observable <ResponseWrapper<any>> {
     return this.http.delete<ResponseWrapper<any>>(`${this.canteenEndpoint}/delete/${id}`);
   }
+
+  clearFilter(field: keyof CanteenFilter){
+    if(Array.isArray(this.filters[field])) {
+      (this.filters[field] as any[]) = [];
+    } else{
+      this.filters[field] = undefined;
+    }
+  }
+
+
 }

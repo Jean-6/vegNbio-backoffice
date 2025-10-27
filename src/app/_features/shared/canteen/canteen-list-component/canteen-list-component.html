@@ -41,28 +41,32 @@
                   </div>
                   <p-autoComplete
                     (completeMethod)="search($event)"
-                    [(ngModel)]="canteenService.canteenFilter.name"
+                    [(ngModel)]="canteenService.filters.name"
+                    (ngModelChange)="onNameChange($event)"
                     [fluid]="true"
                     [ngModelOptions]="{standalone: true}"
                     [pAutoFocus]="true"
                     [suggestions]="filteredCanteen"
                     autocomplete="off"
-                    optionLabel="name" optionValue="id"
-                  ></p-autoComplete>
+                    optionLabel="name"
+
+                  ></p-autoComplete><!--optionValue="id"-->
                 </div>
 
                 <div class="col-lg-3 col-md-3 col-12">
                   <div>
-                    <label class="form-label fw-bold">Adresse</label>
+                    <label class="form-label fw-bold">Ville</label>
                   </div>
-                  <input
-                    [(ngModel)]="canteenService.canteenFilter.address"
+                  <p-multiselect
+                    [options]="cityParams"
+                    [(ngModel)]="canteenService.filters.cities"
+                    optionValue="value"
+                    [maxSelectedLabels]="3"
                     [fluid]="true"
                     [ngModelOptions]="{standalone: true}"
                     [pAutoFocus]="true"
-                    autocomplete="off"
-                    pInputText type="text"
-                  />
+
+                  ></p-multiselect>
                 </div>
 
                 <div class="col-lg-3 col-md-3 col-12">
@@ -70,7 +74,7 @@
                     <label class="form-label fw-bold">Services proposés</label>
                   </div>
                   <p-multiselect
-                    [(ngModel)]="canteenService.canteenFilter.services"
+                    [(ngModel)]="canteenService.filters.services"
                     [fluid]="true"
                     [maxSelectedLabels]="1"
                     [ngModelOptions]="{standalone: true}"
@@ -78,71 +82,10 @@
                     [pAutoFocus]="true"
                     class="w-full md:w-80"
                     optionLabel="label"
-                    optionValue="value" placeholder="Selectionner un service"
+                    optionValue="value"
+                    placeholder="Selectionner un service"
                   >
                   </p-multiselect>
-                </div>
-
-                <div class="col-lg-3 col-md-3 col-12">
-                  <div>
-                    <label class="form-label fw-bold">Restaurateur</label>
-                  </div>
-                  <input
-                    [(ngModel)]="canteenService.canteenFilter.restorer"
-                    [fluid]="true"
-                    [ngModelOptions]="{standalone: true}"
-                    [pAutoFocus]="true"
-                    autocomplete="off"
-                    pInputText type="text"
-                  />
-                </div>
-
-              </div>
-
-              <div class="row">
-                <div class="col-lg-3 col-md-3 col-12">
-                  <div>
-                    <label class="form-label fw-bold">Places</label>
-                  </div>
-                  <p-inputnumber
-                    [(ngModel)]="canteenService.canteenFilter.seats"
-                    [fluid]="true"
-                    [ngModelOptions]="{standalone: true}"
-                    [pAutoFocus]="true"
-                    [showButtons]="true"
-                    inputId="stacked" mode="decimal"
-                  ></p-inputnumber>
-                </div>
-
-
-                <div class="col-lg-3 col-md-4 col-12">
-                  <div>
-                    <label class="form-label fw-bold">Heure d'ouverture</label>
-                  </div>
-                  <p-datepicker
-                    [(ngModel)]="canteenService.canteenFilter.startOpeningHour"
-                    [ngModelOptions]="{standalone: true}"
-                    [showIcon]="true"
-                    [showOnFocus]="false"
-                    inputId="buttondisplay"
-
-                  >
-                  </p-datepicker>
-                </div>
-
-                <div class="col-lg-3 col-md-4 col-12">
-                  <div>
-                    <label class="form-label fw-bold">Heure de fermeture</label>
-                  </div>
-                  <p-datepicker
-                    [(ngModel)]="canteenService.canteenFilter.endOpeningHour"
-                    [fluid]="true"
-                    [ngModelOptions]="{standalone: true}"
-                    [pAutoFocus]="true"
-                    [showIcon]="true"
-                    [showOnFocus]="false" inputId="buttondisplay"
-                  >
-                  </p-datepicker>
                 </div>
 
                 <div class="col-lg-3 col-md-4 col-12">
@@ -150,7 +93,7 @@
                     <label class="form-label fw-bold">Status</label>
                   </div>
                   <p-multiselect
-                    [(ngModel)]="canteenService.canteenFilter.status"
+                    [(ngModel)]="canteenService.filters.status"
                     [fluid]="true"
                     [maxSelectedLabels]="1"
                     [ngModelOptions]="{standalone: true}"
@@ -159,15 +102,88 @@
                     class="w-full md:w-80"
                     id="status"
                     optionLabel="label"
-                    optionValue="value" placeholder="Selectionner un status"
+                    optionValue="value"
+                    placeholder="Selectionner un status"
                   ></p-multiselect>
                 </div>
+
+                <!--<div class="col-lg-3 col-md-3 col-12">
+                  <div>
+                    <label class="form-label fw-bold">Restaurateur</label>
+                  </div>
+                  <input
+                    [(ngModel)]="canteenService.filters.restorer"
+                    [fluid]="true"
+                    [ngModelOptions]="{standalone: true}"
+                    [pAutoFocus]="true"
+                    autocomplete="off"
+                    pInputText type="text"
+                  />
+                </div>-->
+
+              </div>
+
+              <div class="row">
+                <!--<div class="col-lg-3 col-md-3 col-12">
+                  <div>
+                    <label class="form-label fw-bold">Places</label>
+                  </div>
+                  <p-inputnumber
+                    [(ngModel)]="canteenService.filters.seats"
+                    [fluid]="true"
+                    [ngModelOptions]="{standalone: true}"
+                    [pAutoFocus]="true"
+                    [showButtons]="true"
+                    inputId="stacked" mode="decimal"
+                  ></p-inputnumber>
+                </div>-->
+
+
+                <!--<div class="col-lg-3 col-md-4 col-12">
+                  <div>
+                    <label class="form-label fw-bold">Heure d'ouverture</label>
+                  </div>
+                  <p-datepicker
+                    [(ngModel)]="canteenService.filters.startOpeningHour"
+                    [ngModelOptions]="{standalone: true}"
+                    [showIcon]="true"
+                    [showOnFocus]="false"
+                    inputId="buttondisplay"
+
+                  >
+                  </p-datepicker>
+                </div>-->
+
+                <!--<div class="col-lg-3 col-md-4 col-12">
+                  <div>
+                    <label class="form-label fw-bold">Heure de fermeture</label>
+                  </div>
+                  <p-datepicker
+                    [(ngModel)]="canteenService.filters.endOpeningHour"
+                    [fluid]="true"
+                    [ngModelOptions]="{standalone: true}"
+                    [pAutoFocus]="true"
+                    [showIcon]="true"
+                    [showOnFocus]="false" inputId="buttondisplay"
+                  >
+                  </p-datepicker>
+                </div>-->
+
+
               </div>
 
               <div class="row py-3">
                 <div class="col-lg-4 col-md-6 col-12">
                   <button (click)="loadCanteens()" class="btn btn-primary " type="button">Rechercher</button>
                 </div>
+              </div>
+              <div class="d-flex flex-wrap">
+                <p-chip class="small-chip"
+                        *ngFor="let f of activeFilters"
+                        [label] = "f.value"
+                        [removable]="true"
+                        (onRemove)="removeFilter(f.key)">
+                </p-chip>
               </div>
             </form>
           </div>
@@ -272,6 +288,7 @@
 
                   </div>
                 </div>
+
 
                 <ng-template #noCanteen>
                   <div class="flex flex-col items-center justify-center py-12 text-center text-gray-600">

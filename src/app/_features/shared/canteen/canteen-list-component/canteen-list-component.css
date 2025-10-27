@@ -1,0 +1,9 @@
+.small-chip {
+  font-size: 0.8rem;       /* Texte plus petit */
+  margin-right: 0.4rem;
+  margin-bottom: 0.4rem;
+  padding: 0.25rem 0.5rem; /* Réduit la taille interne */
+  display: inline-flex;    /* Empêche de prendre toute la largeur */
+  align-items: center;
+}
+

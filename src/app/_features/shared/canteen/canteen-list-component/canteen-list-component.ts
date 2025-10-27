@@ -1,16 +1,13 @@
 import {Component, OnInit} from '@angular/core';
-import {DatePicker} from 'primeng/datepicker';
 import {FormsModule} from '@angular/forms';
-import {InputText} from 'primeng/inputtext';
 import {NavbarTop} from '../../../../_core/layout/navbar-top/navbar-top';
 import {CanteenService} from '../../../../_core/services/canteen-service';
 import {CommonModule} from '@angular/common';
-import {Canteen, DayOfWeek, OpeningHours, Status} from '../../../../_core/dto/canteen';
+import {Canteen, CanteenFilter, DayOfWeek, OpeningHours, Status} from '../../../../_core/dto/canteen';
 import {AlertService} from '../../../../_core/services/alert-service';
 import {ResponseWrapper} from '../../../../_core/dto/responseWrapper';
 import {TableModule} from 'primeng/table';
 import {MultiSelect} from 'primeng/multiselect';
-import {InputNumber} from 'primeng/inputnumber';
 import {Loader} from '../../../../_core/layout/loader/loader';
 import {Button} from 'primeng/button';
 import {SelectItem} from '../../../../_core/dto/selectItem';
@@ -21,19 +18,17 @@ import {AsideMenuComponent} from '../../../../_core/layout/aside-menu-component/
 import {Dialog} from 'primeng/dialog';
 import {Image} from 'primeng/image';
 import {AuthService} from '../../../../_core/services/auth-service';
+import {Chip} from 'primeng/chip';
 
 
 @Component({
   selector: 'app-canteen-list-component',
   imports: [
     CommonModule,
-    DatePicker,
     FormsModule,
-    InputText,
     MultiSelect,
     NavbarTop,
     TableModule,
-    InputNumber,
     Loader,
     AutoComplete,
     AutoFocus,
@@ -41,6 +36,7 @@ import {AuthService} from '../../../../_core/services/auth-service';
     Dialog,
     Image,
     Button,
+    Chip,
   ],
   templateUrl: './canteen-list-component.html',
   standalone: true,
@@ -50,7 +46,8 @@ export class CanteenListComponent implements OnInit{
 
   canteenParams: SelectCanteen[] = [];
   filteredCanteen: SelectCanteen[] = [];
-  eventParams: SelectItem[] = [];
+  cityParams: SelectItem[] = [];
+  filteredCity: SelectItem[] = [];
   statusParams: SelectItem[] = [];
   serviceParams: SelectItem[] = [];
   canteens: Canteen[] = [];
@@ -58,6 +55,8 @@ export class CanteenListComponent implements OnInit{
   selectedCanteen: Canteen | null = null;
   visible: boolean =  false ;
   isLoading= false;
+
+  activeFilters: { key: keyof CanteenFilter; label: string; value: string }[] = [];
 
   daysOfWeek = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
   dayMap: Record<string, DayOfWeek> = {
@@ -86,6 +85,7 @@ export class CanteenListComponent implements OnInit{
 
   ngOnInit(): void {
 
+    this.loadCityParams()
     this.loadCanteenParams()
     this.loadCanteenService()
     this.loadCanteenStatus()
@@ -94,12 +94,12 @@ export class CanteenListComponent implements OnInit{
 
   loadCanteens() {
     this.isLoading = true;
-    this.canteenService.loadCanteens(this.canteenService.canteenFilter)
+    this.canteenService.loadCanteens(this.canteenService.filters)
       .subscribe({
         next: (res: ResponseWrapper<Canteen[]>) => {
           this.canteens = res.data;
+          this.updateActiveFilters()
           this.isLoading = false;
-          console.log(res.data);
         },
         error: (err: any) => {
           console.log(`Error http when fetching canteens : ${err}`);
@@ -109,10 +109,12 @@ export class CanteenListComponent implements OnInit{
 
 
   loadCanteenStatus(){
+    this.isLoading= true;
     this.paramService.getApprovalStatuses()
       .subscribe({
         next: options => {
           this.statusParams = options;
+          this.isLoading = false;
         },
         error: err => {
           console.error('Error loading canteen param:', err);
@@ -122,10 +124,12 @@ export class CanteenListComponent implements OnInit{
   }
 
   loadCanteenService(){
+    this.isLoading= true;
     this.paramService.getServiceTypes()
       .subscribe({
         next: options => {
           this.serviceParams = options;
+          this.isLoading = false;
         },
         error: err => {
           console.error('Error loading service param:', err);
@@ -155,6 +159,23 @@ export class CanteenListComponent implements OnInit{
         error: err => {
           console.error('Error loading service param:', err);
           this.alertService.error(`Error loading service param: ${err}`);
+        }
+      })
+  }
+
+  loadCityParams(){
+    this.isLoading = true;
+    this.paramService.getCities()
+      .subscribe({
+        next: (options: SelectItem[]) => {
+          this.cityParams = options;
+          this.filteredCity = [...options];
+          console.log(options)
+          this.isLoading = false;
+        },
+        error: err => {
+          console.error('Error loading cities like parameter:', err);
+          this.alertService.error(`Error loading cities like parameter: ${err}`);
         }
       })
   }
@@ -218,7 +239,7 @@ export class CanteenListComponent implements OnInit{
           this.isLoading =false;
           this.closeDialog()
           this.alertService.success("Restaurant supprimée avec succes");
-          this.ngOnInit()
+          this.loadCanteens()
         },
         error: (err)=>{
           console.error('Error when deleting canteen:', err);
@@ -234,4 +255,51 @@ export class CanteenListComponent implements OnInit{
   }
 
   protected readonly Status = Status;
+
+  selectedCanteenName: string = '';
+
+  onNameChange(value: string | SelectCanteen) {
+    if (value && typeof value === 'object' && 'name' in value) {
+      this.canteenService.filters.name = value.name;
+    } else {
+      this.canteenService.filters.name = value as string;
+    }
+  }
+
+  updateActiveFilters() {
+    const f = this.canteenService.filters;
+    this.activeFilters = [];
+
+    if (f.name) {
+      const nameValue = typeof f.name === 'string' ? f.name : (f.name as any).name;
+      this.activeFilters.push({ key: 'name', label: 'Nom', value: nameValue });
+    }
+
+    if (f.status?.length) {
+      f.status.forEach(s => {
+        const statusLabel = this.statusParams.find(p => p.value === s)?.label || s;
+        this.activeFilters.push({ key: 'status', label: 'Statut', value: statusLabel });
+      });
+    }
+
+    if (f.cities && f.cities.length > 0) {
+      const citiesValue = f.cities.join(', ');
+      this.activeFilters.push({ key: 'cities', label: 'Villes', value: citiesValue });
+    }
+
+    if (f.services && f.services.length > 0) {
+      const selectedLabels = this.serviceParams
+        .filter(s => f.services?.includes(s.value))
+        .map(s => s.label);
+      const servicesValue = selectedLabels.join(', ');
+      this.activeFilters.push({ key: 'services', label: 'Services', value: servicesValue });
+    }
+
+  }
+
+  removeFilter(filterKey: keyof CanteenFilter){
+    this.canteenService.clearFilter(filterKey);
+    this.loadCanteens();
+  }
+
 }

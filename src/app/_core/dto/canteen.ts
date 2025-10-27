@@ -55,13 +55,13 @@ export interface Approval{
 }
 export interface CanteenFilter {
   name?: string ;
-  address?: string ;
+  cities?: string[] ;
   services?: string[] ;
-  seats?: number ;
-  startOpeningHour?: Date;
-  endOpeningHour?: Date;
-  restorer?: string ;
-  status?: string ; //Actif - Ferme temporairement - Supprime
+  //seats?: number ;
+  //startOpeningHour?: Date;
+  //endOpeningHour?: Date;
+  //restorer?: string ;
+  status?: string[] ;
 }
 
 
