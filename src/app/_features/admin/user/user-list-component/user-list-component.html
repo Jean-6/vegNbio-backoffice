@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <title>Aside Menu Layout</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+
+  </style>
+</head>
+<body>
+
+
+<div class="container-fluid">
+  <div class="row flex-nowrap ">
+    <!-- SideMenu -->
+    <nav class="col-12 col-xs-3 col-md-3 col-xl-2 px-0 bg-dark text-white sidebar">
+      <app-aside-menu-component/>
+    </nav>
+
+    <main class="col">
+
+      <div class="container-fluid">
+        <app-navbar-top></app-navbar-top>
+      </div>
+
+      <div class="container-fluid">
+        <h3>Liste des utilisateurs</h3>
+      </div>
+
+
+      <div class="container-fluid">
+        <div class="card border-0 shadow rounded-3">
+          <div class="card-body">
+            <form>
+              <div class="row">
+                <div class="col-lg-4 col-md-4 col-12">
+                  <div>
+                    <label class="form-label fw-bold">Status</label>
+                  </div>
+                  <p-select
+                    [options]="status"
+                    [(ngModel)]="userService.filters.status"
+                    optionLabel="label"
+                    optionValue="value"
+                    class="w-75"
+                    [ngModelOptions]="{standalone: true}">
+                  </p-select>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-12">
+                  <div>
+                    <label class="form-label fw-bold">Email</label>
+                  </div>
+                  <p-autoComplete
+                    [(ngModel)]="userService.filters.email"
+                    [suggestions]="filteredEmails"
+                    (completeMethod)="filterEmails($event)"
+                    placeholder="Rechercher par email"
+                    [ngModelOptions]="{standalone: true}">
+                  </p-autoComplete>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-12">
+                  <div>
+                    <label class="form-label fw-bold">Role</label>
+                  </div>
+                  <p-multiselect
+                    [options]="roles"
+                    [(ngModel)]="userService.filters.roles"
+                    optionLabel="label"
+                    optionValue="value"
+                    [maxSelectedLabels]="1"
+                    placeholder="Selectionner un status"
+                    [ngModelOptions]="{standalone: true}"
+                    class="w-75"
+                  ></p-multiselect>
+                </div>
+
+              </div>
+
+              <div class="row py-3">
+                <div class="col-lg-4 col-md-6 col-12">
+                  <button (click)="loadUsers()" class="btn btn-primary " type="button">Rechercher</button>
+                </div>
+              </div>
+              <div class="d-flex flex-wrap">
+                <p-chip class="small-chip"
+                        *ngFor="let f of activeFilters"
+                        [label] = "f.value"
+                        [removable]="true"
+                        (onRemove)="removeFilter(f.key)">
+                </p-chip>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+
+
+      <div class="container-fluid py-4">
+        <div class="card border-0 shadow rounded-3">
+          <div class="card-body  p-sm-2" style="max-height: 65vh; overflow-y:auto ;overflow-x: hidden">
+
+            <div class="row d-flex justify-content-start mt-3">
+              @if (isLoading) {
+                <app-loader></app-loader>
+              }
+
+              <p-table
+                [paginator]="true"
+                [rowsPerPageOptions]="[5, 10, 20]"
+                [rows]="8"
+                [tableStyle]="{ 'min-width': '70rem' }"
+                [value]="users"
+                class="modern-table"
+                size="small"
+              >
+                <!-- HEADER -->
+                <ng-template #header>
+                  <tr>
+                    <th pSortableColumn="username">
+                      <div class="flex items-center gap-2">
+                        <i class="pi pi-user text-primary"></i>
+                        Utilisateur
+                        <p-sortIcon field="username"/>
+                      </div>
+                    </th>
+
+                    <th pSortableColumn="email">
+                      <div class="flex items-center gap-2">
+                        <i class="pi pi-envelope text-info"></i>
+                        Email
+                        <p-sortIcon field="email"/>
+                      </div>
+                    </th>
+
+                    <th pSortableColumn="role">
+                      <div class="flex items-center gap-2">
+                        <i class="pi pi-briefcase text-warning"></i>
+                        Rôle
+                        <p-sortIcon field="role"/>
+                      </div>
+                    </th>
+
+                    <th pSortableColumn="status">
+                      <div class="flex items-center gap-2">
+                        <i class="pi pi-bolt text-success"></i>
+                        Statut
+                        <p-sortIcon field="status"/>
+                      </div>
+                    </th>
+
+                    <th class="text-center"><i class="pi pi-cog"></i> Actions</th>
+                  </tr>
+                </ng-template>
+
+                <!-- BODY -->
+                <ng-template #body let-user>
+                  <tr class="align-middle">
+                    <!-- Username -->
+                    <td class="fw-semibold text-dark">
+                      <div class="d-flex align-items-center gap-2">
+                        <i class="pi pi-user-circle text-primary"></i>
+                        <span>{{ user.username }}</span>
+                      </div>
+                    </td>
+
+                    <!-- Email -->
+                    <td class="text-muted">{{ user.email }}</td>
+
+                    <!-- Role -->
+                    <td>
+                      <p-tag
+                        [severity]="getSeverity(user.roles[0].role)"
+                        [value]="getRole(user.roles[0].role)"
+                        class="me-1"
+                        styleClass="px-3 py-1 text-sm fw-semibold rounded-pill shadow-sm"
+                      ></p-tag>
+                    </td>
+
+                    <!-- Status -->
+                    <td>
+                      <p-tag
+                        [severity]="user.active ? 'success' : 'danger'"
+                        [value]="user.active ? 'Actif' : 'Inactif'"
+                        class="me-1"
+                        styleClass="px-3 py-1 text-sm fw-semibold rounded-pill shadow-sm"
+                      ></p-tag>
+                    </td>
+
+                    <!-- Actions -->
+                    <td class="text-center">
+                      <div class="d-flex justify-content-center gap-2">
+                        <p-button
+                          (click)="showDialog(user)"
+                          [outlined]="true"
+                          [rounded]="true"
+                          icon="pi pi-pencil"
+                          pTooltip="Modifier"
+                          severity="info"
+                          tooltipPosition="top"
+                        ></p-button>
+
+                        <!--<p-button
+                          (click)="delete(user)"
+                          [outlined]="true"
+                          [rounded]="true"
+                          icon="pi pi-trash"
+                          pTooltip="Supprimer"
+                          severity="danger"
+                          tooltipPosition="top"
+                        ></p-button>-->
+                      </div>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+
+              <p-dialog [(visible)]="visible"
+                        [closable]="true"
+                        [contentStyle]="{ 'max-height': '80vh', 'overflow-y': 'auto', 'padding': '0rem' }"
+                        [dismissableMask]="true"
+                        [modal]="true"
+                        [style]="{ width: '55rem', maxWidth: '95vw' }"
+                        header="Details utilisateur"
+                        styleClass="p-0">
+
+                <ng-container *ngIf="selectedUser">
+                  <p-card>
+                    <div class="flex flex-column">
+                      <!-- Info utilisateur -->
+                      <div class="flex justify-content-between align-items-center">
+                        <div>
+                          <p><strong>Login :</strong>
+                            <span>
+                              {{ selectedUser.username  }}
+                            </span>
+                          </p>
+                          <p><strong>Email :</strong>
+                            <span>
+                              {{ selectedUser.email }}
+                            </span>
+                         </p>
+
+                          <p><strong>Statut :</strong>
+
+                            <span
+                              [style.text-decoration]="selectedUser.active ? 'underline' : 'none'"
+                              [style.color]="selectedUser.active ? 'green' : 'crimson'"
+                              style="cursor: default; pointer-events: none;">
+                              {{ selectedUser.active ? 'Compte Actif' : 'Compte Inactif' }}
+                            </span>
+                          </p>
+                        </div>
+
+                        <!-- PDF utilisateur -->
+                        <p-panel header="Documents utilisateurs" [toggleable]="true" [collapsed]="true">
+                          <h5 class="font-medium mb-3">Documents de vérification</h5>
+                          <div class="grid md:grid-cols-2 gap-4">
+                            <ng-container *ngFor="let doc of selectedUser.docs; let i = index" >
+                              <p-card [header]="" class="shadow-sm border" >
+                                <div class="flex flex-col items-center justify-center">
+                                  <pdf-viewer
+
+                                    [original-size]="false"
+                                    [render-text]="true"
+                                    [src]="doc"
+                                    style="width:100%; height:400px; border:1px solid #ddd; border-radius:8px">
+                                  </pdf-viewer>
+                                  <a [href]="doc" class="mt-2 text-primary underline" target="_blank">Ouvrir dans un
+                                    nouvel onglet</a>
+                                </div>
+                              </p-card>
+                            </ng-container>
+
+                            <ng-container *ngIf="!selectedUser.docs?.length">
+                              <p class="text-sm text-color-secondary italic">Aucun document disponible</p>
+                            </ng-container>
+                          </div>
+                        </p-panel>
+                      </div>
+
+
+                      <div class="d-flex align-content-between my-2">
+                        <p-button
+                          (onClick)="verifyUser(selectedUser)"
+                          [disabled]="selectedUser.isVerified"
+                          [severity]="'success'"
+                          icon="pi pi-check-circle"
+                          label="Marquer comme vérifié">
+                        </p-button>
+                        <p-button
+                          (click)="toggleActive(selectedUser)"
+                          [severity]="selectedUser.active ? 'danger' : 'help'"
+                          class="mx-3"
+                          [icon]="selectedUser.active ? 'pi pi-lock' : 'pi pi-unlock'"
+                          [label]="selectedUser.active ? 'Désactiver le compte' : 'Activer le compte'">
+                        </p-button>
+                      </div>
+                    </div>
+                  </p-card>
+                </ng-container>
+                <!-- Footer -->
+                <ng-template pTemplate="footer">
+                  <div class="d-flex justify-content-end gap-2">
+                    <p-button (click)="closeDialog()" icon="pi pi-times" label="Fermer" severity="secondary"
+                              size="small"/>
+                  </div>
+                </ng-template>
+              </p-dialog>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+
+</html>

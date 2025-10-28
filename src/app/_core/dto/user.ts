@@ -2,22 +2,22 @@ import {Role} from './Role';
 
 
 export interface User {
-  id: number;
+  id: string;
   username: string;
   email: string;
   roles : Role[];
   token: string;
-  isActive: boolean;
+  active: boolean;
+  isVerified: boolean;
+  docs : string[]
+
 }
 export class UserFilter {
 
   status?: string[] ;
-  username?: string ;
+  username?: string;
   email?: string ;
-  role?: string ;
-  city?: string[] ;
-  //from?: Date ;
-  //to?: Date ;
+  roles?: string[] ;
 }
 
 
