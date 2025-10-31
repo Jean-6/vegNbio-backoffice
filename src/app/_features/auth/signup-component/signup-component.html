@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <title></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href=""/>
+</head>
+
+<body>
+<div>
+  <nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand text-uppercase" href="index.html">Veg'N'Bio</a>
+      <div class="collapse navbar-collapse" id="navbars">
+        <!--<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+          <li class="nav-item active">
+            <a class="nav-link fw-bolder">Accueil</a>
+          </li>
+          <li><a class="nav-link fw-bolder">Nous contacter</a></li>
+          <li><a class="nav-link fw-bolder">A propos de nous</a></li>
+          <li><a class="nav-link fw-bolder">Faire un don</a></li>
+          <li><a class="nav-link fw-bolder">Servir</a></li>
+        </ul>
+        <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+          <li><a class="nav-link" href="#"><img src="" alt=""></a></li>
+          <li><a class="nav-link" href=""><img src="" alt=""></a></li>
+        </ul>-->
+      </div>
+    </div>
+  </nav>
+
+  <div class="row">
+    @if (authService.isLoading) {
+      <app-loader/>
+    }
+
+  </div>
+
+
+  <div class="d-flex justify-content-center align-items-center " style="margin-top: 15vh">
+    <div>
+      <h5 class="card-title text-center text-uppercase mb-5 fw-bold fs-5">Inscription</h5>
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <div class="row">
+          <div class="col-md">
+            <label for="username" class="form-label">Login</label>
+            <input id="username" class="form-label w-100 mb-3" type="text" pInputText formControlName="username" pSize="small" autocomplete="off" placeholder="Nom utilisateur" [pAutoFocus]="true" [fluid]="true"/>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md">
+            <label for="email" class="form-label">Email</label>
+            <input id="email" class="form-label w-100 mb-3" type="email" pInputText formControlName="email" pSize="small" autocomplete="off" placeholder="Email" [pAutoFocus]="true" [fluid]="true"/>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md">
+            <label for="password" class="form-label">Mot de passe</label>
+            <input id="password" class="form-label w-100 mb-3" type="password" pInputText formControlName="password" pSize="small" autocomplete="new-password" placeholder="Mot de passe" [pAutoFocus]="true" [fluid]="true"/>
+          </div>
+        </div>
+
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center pt-2">
+          <a [routerLink]="['/sign-in']" class="link-danger text-decoration-none" style="font-size: 0.80rem;"> Se connecter</a>
+          <a [routerLink]="['/forgot-password']" class="link-danger text-decoration-none" style="font-size: 0.80rem;"> Mot de passe oublié</a>
+        </div>
+
+        <div class="d-flex justify-content-center align-items-center ">
+          <button type="submit" class="btn btn-danger  fw-bolder mt-3"
+                  [disabled]="registerForm.invalid || this.authService.isLoading">Enregistrer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <footer class="footer-section fixed-bottom">
+    <div class="container relative">
+      <div class="border-top copyright">
+        <div class="row">
+          <div class="col-lg-6">
+            <p class=" text-center text-lg-start ">Copyright &copy;2025 Vegnbio, Paris. Tous droits
+              réservés.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>
+</body>
+</html>
+<router-outlet/>
