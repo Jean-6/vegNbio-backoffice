@@ -1,5 +1,6 @@
 
 import {Location} from './location';
+import {Approval} from './approval';
 
 export enum Status {
   PENDING = "PENDING",
@@ -48,11 +49,8 @@ export interface Canteen {
   createdAt: Date;
 }
 
-export interface Approval{
-  status ?: Status ;
-  reasons?: String ;
 
-}
+
 export interface CanteenFilter {
   name?: string ;
   cities?: string[] ;

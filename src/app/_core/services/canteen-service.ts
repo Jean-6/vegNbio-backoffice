@@ -2,9 +2,10 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable, throwError} from 'rxjs';
 import {ResponseWrapper} from '../dto/responseWrapper';
-import {AddCanteen, Approval, Canteen, CanteenFilter} from '../dto/canteen';
+import {AddCanteen, Canteen, CanteenFilter} from '../dto/canteen';
 import {AuthService} from './auth-service';
 import {environment} from '../../../environments/environment';
+import {Approval} from '../dto/approval';
 
 
 

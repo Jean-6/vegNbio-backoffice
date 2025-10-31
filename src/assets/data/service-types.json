@@ -1,8 +1,5 @@
 [
-  { "label": "Plateaux repas", "value": "Meal" },
   { "label": "Animation", "value": "Animation" },
-  { "label": "Wifi", "value": "Wifi" },
-  { "label": "Imprimante", "value": "Printer" },
   { "label": "Salle de conférence", "value": "Conference" },
   { "label": "Espace de méditation", "value": "Meditation" }
 ]
