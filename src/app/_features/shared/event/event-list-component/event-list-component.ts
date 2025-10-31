@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {AdminAsideMenu} from '../../../../_core/layout/admin-aside-menu/admin-aside-menu';
 import {DatePicker} from 'primeng/datepicker';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {InputNumber} from 'primeng/inputnumber';
@@ -12,10 +11,10 @@ import {Loader} from '../../../../_core/layout/loader/loader';
 import {CommonModule} from '@angular/common';
 import {ResponseWrapper} from '../../../../_core/dto/responseWrapper';
 import {Event} from '../../../../_core/dto/event';
-import {Canteen, Status} from '../../../../_core/models/canteen';
+import {Canteen, Status} from '../../../../_core/dto/canteen';
 import {map} from 'rxjs';
 import {AutoComplete} from 'primeng/autocomplete';
-import {EventStatus} from '../../../../_core/models/eventStatus';
+import {EventStatus} from '../../../../_core/dto/eventStatus';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
 import {Image} from 'primeng/image';
@@ -23,6 +22,8 @@ import {PrimeTemplate} from 'primeng/api';
 import {AutoFocus} from 'primeng/autofocus';
 import {ParamService} from '../../../../_core/services/param-service';
 import {SelectItem} from '../../../../_core/dto/selectItem';
+import {AsideMenuComponent} from '../../../../_core/layout/aside-menu-component/aside-menu-component';
+import {AuthService} from '../../../../_core/services/auth-service';
 
 
 export interface CanteenOption {
@@ -35,7 +36,6 @@ export interface CanteenOption {
   selector: 'app-event-list-component',
   imports: [
     CommonModule,
-    AdminAsideMenu,
     DatePicker,
     FormsModule,
     InputNumber,
@@ -49,6 +49,7 @@ export interface CanteenOption {
     Image,
     PrimeTemplate,
     AutoFocus,
+    AsideMenuComponent,
   ],
   templateUrl: './event-list-component.html',
   standalone: true,
@@ -72,7 +73,8 @@ export class EventListComponent implements OnInit {
   constructor(protected eventService: EventService,
               protected canteenService: CanteenService,
               private alertService: AlertService,
-              private paramService: ParamService) {
+              private paramService: ParamService,
+              protected authService: AuthService) {
   }
 
   ngOnInit(): void {
@@ -150,7 +152,8 @@ export class EventListComponent implements OnInit {
     });
   }
 
-  /*loadEventOptions() {
+  /*
+  loadEventOptions() {
     this.eventService.getEventOptions()
       .subscribe({
         next: options => {
@@ -161,9 +164,9 @@ export class EventListComponent implements OnInit {
           this.alertService.error(`Error loading event param: ${err}`);
         }
       })
-  }*/
+  }
 
-  /*loadEventStatus() {
+  loadEventStatus() {
     this.eventService.getEventStatus()
       .subscribe({
         next: options => {
@@ -174,7 +177,9 @@ export class EventListComponent implements OnInit {
           this.alertService.error(`Error loading status param: ${err}`);
         }
       })
-  }*/
+  }
+
+  */
 
   getStatusFlagClass(event: Event): string {
 
@@ -224,17 +229,73 @@ export class EventListComponent implements OnInit {
     this.visible = true;
   }
 
+
+  submitApproval(selectedEvent: Event | null) {
+    this.isLoading = true;
+    if(!selectedEvent) return;
+    this.eventService
+      .approveOrReject(selectedEvent.id, {status: Status.APPROVED})
+      .subscribe({
+        next:() =>{
+          this.isLoading =false
+          this.closeDialog()
+          this.alertService.success("evenement approuvé")
+          this.ngOnInit()
+
+        },
+        error:(err)=>{
+          console.error('Error when approving event:', err);
+          this.alertService.error(`Error when approving event: ${err}`);
+        }
+      })
+  }
+
+  submitReject(selectedEvent: Event | null){
+    this.isLoading = true;
+    if(!selectedEvent) return;
+    this.eventService
+      .approveOrReject(selectedEvent.id, {status: Status.REJECTED} )
+      .subscribe({
+        next:() =>{
+          this.isLoading =false;
+          this.closeDialog()
+          this.alertService.success("Approbation refusée");
+          this.ngOnInit()
+        },
+        error: (err)=>{
+          console.error('Error when rejecting event:', err);
+          this.alertService.error(`Error when rejecting event: ${err}`);
+        }
+      })
+  }
+
   protected readonly EventStatus = EventStatus;
 
-  rejectEvent(selectedEvent: Event | null) {
+  deleteEvent(selectedEvent: Event | null) {
+    this.isLoading = true;
+    if(!selectedEvent) return;
+    this.eventService
+      .delete(selectedEvent.id )
+      .subscribe({
+        next:() =>{
+          this.isLoading =false;
+          this.closeDialog()
+          this.alertService.success("Evenement supprimée avec succes");
+          this.loadEvents()
+        },
+        error: (err)=>{
+          console.error('Error when deleting event:', err);
+          this.alertService.error(`Error when deleting event: ${err}`);
+        }
+      })
 
   }
 
-  approveEvent(selectedEvent: Event | null) {
-
+  closeDialog() {
+    this.visible = false;
+    this.selectedEvent = null;
   }
 
-  updateApproval(selectedEvent: Event | null, rejected: string) {
 
-  }
+  protected readonly Status = Status;
 }

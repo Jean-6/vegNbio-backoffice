@@ -1,6 +1,6 @@
 import {EventStatus} from './eventStatus';
 import {Location} from './location';
-import {Approval} from './canteen';
+import {Approval} from './approval';
 
 
 export interface Event {
