@@ -16,7 +16,7 @@
   <div class="row flex-nowrap ">
     <!-- SideMenu -->
     <nav class="col-12 col-xs-3 col-md-3 col-xl-2 px-0 bg-dark text-white sidebar">
-      <app-admin-aside-menu/>
+      <app-aside-menu-component/>
     </nav>
 
     <main class="col">
@@ -124,7 +124,9 @@
                         <p-datepicker [showIcon]="true" appendTo="body"
                                       formControlName="date"
                                       [minDate]="minDate"
-                                      placeholder="Choisir une date" [fluid]="true"></p-datepicker>
+                                      placeholder="Choisir une date" [fluid]="true"
+                                      dateFormat="dd-mm-yy">
+                        </p-datepicker>
                         <small *ngIf="date?.hasError('required') && date?.touched" class="text-danger d-block mt-1">
                           La date est obligatoire.
                         </small>

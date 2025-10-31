@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {AdminAsideMenu} from '../../../../_core/layout/admin-aside-menu/admin-aside-menu';
 import {NavbarTop} from '../../../../_core/layout/navbar-top/navbar-top';
 import {AutoComplete, AutoCompleteSelectEvent} from 'primeng/autocomplete';
 import {
@@ -19,21 +18,20 @@ import {InputText} from 'primeng/inputtext';
 import {EventService} from '../../../../_core/services/event-service';
 import {CanteenService} from '../../../../_core/services/canteen-service';
 import {AlertService} from '../../../../_core/services/alert-service';
-import {CanteenOption} from '../event-list-component/event-list-component';
 import {Textarea} from 'primeng/textarea';
-import {map} from 'rxjs';
 import {ResponseWrapper} from '../../../../_core/dto/responseWrapper';
-import {Canteen, DayOfWeek, OpeningHours} from '../../../../_core/models/canteen';
+import {Canteen, DayOfWeek} from '../../../../_core/dto/canteen';
 import {FileSelectEvent, FileUpload} from 'primeng/fileupload';
 import {AnimateOnScroll} from 'primeng/animateonscroll';
 import {GalleriaModule} from 'primeng/galleria';
 import {Loader} from '../../../../_core/layout/loader/loader';
-import {AddEvent} from '../../../../_core/dto/addEvent';
 import {AuthService} from '../../../../_core/services/auth-service';
 import {RouterLink} from '@angular/router';
 import {AutoFocus} from 'primeng/autofocus';
-import {ParamService} from '../../../../_core/services/param-service';
+import {ParamService, SelectCanteen} from '../../../../_core/services/param-service';
 import {SelectItem} from '../../../../_core/dto/selectItem';
+import {AsideMenuComponent} from '../../../../_core/layout/aside-menu-component/aside-menu-component';
+import {AddEvent} from '../../../../_core/dto/event';
 
 
 interface AutoCompleteCompleteEvent {
@@ -44,7 +42,7 @@ interface AutoCompleteCompleteEvent {
 @Component({
   selector: 'app-add-event-component',
   imports: [
-    AdminAsideMenu,
+    CommonModule,
     NavbarTop,
     FormsModule,
     ReactiveFormsModule,
@@ -65,6 +63,7 @@ interface AutoCompleteCompleteEvent {
     Loader,
     RouterLink,
     AutoFocus,
+    AsideMenuComponent,
   ],
   templateUrl: './add-event-component.html',
   standalone: true,
@@ -77,8 +76,8 @@ export class AddEventComponent implements OnInit{
   locationForm!: FormGroup;
   mediaForm!: FormGroup;
   activeStep: number = 1;
-  canteenParams: CanteenOption[] = [];
-  filteredCanteens: CanteenOption[] = [];
+  canteenParams: SelectCanteen[] = [];
+  filteredCanteens: SelectCanteen[] = [];
   eventTypeParams: SelectItem[] = [];
   filteredEventType: SelectItem[] = [];
   _activeIndex: number = 0;
@@ -113,7 +112,7 @@ export class AddEventComponent implements OnInit{
   ngOnInit(): void {
 
     this.loadEventTypes()
-    this.loadCanteenOptions();
+    this.loadOwnCanteenOptions();
 
   }
 
@@ -159,23 +158,18 @@ export class AddEventComponent implements OnInit{
 
   }
 
-  loadCanteenOptions() {
-    this.canteenService.getCanteenSelected().pipe(
-      map((res: ResponseWrapper<Canteen[]>) => {
-        const seenNames = new Set<string>();
-        return res.data
-          .map(c => ({ id: c.id, name: c.name } as CanteenOption))
-          .filter(c => {
-            if (seenNames.has(c.name)) return false;
-            seenNames.add(c.name);
-            return true;
-          });
-      })
-    ).subscribe({
-      next: (canteenSelectList: CanteenOption[]) => {
-        this.canteenParams = canteenSelectList;
-        this.filteredCanteens = [...canteenSelectList];
-        console.log('Canteen options:', canteenSelectList);
+  loadOwnCanteenOptions() {
+    this.loading = true;
+    this.paramService.getOwnCanteensApproved()
+      .subscribe({
+      next: (option: ResponseWrapper<SelectCanteen[]>) => {
+        this.canteenParams = option.data;
+        this.filteredCanteens = [...option.data];
+        this.loading = false;
+
+        if (!this.filteredCanteens || this.filteredCanteens.length === 0) {
+          this.alertService.warn("Aucun restaurant trouvé.");
+        }
       },
       error: err => {
         console.error('Error loading canteen param:', err);
@@ -361,36 +355,16 @@ export class AddEventComponent implements OnInit{
 
   getDayLabel(day: DayOfWeek): string {
     switch(day) {
-      case DayOfWeek.Monday: return 'Lundi';
-      case DayOfWeek.Tuesday: return 'Mardi';
-      case DayOfWeek.Wednesday: return 'Mercredi';
-      case DayOfWeek.Thursday: return 'Jeudi';
-      case DayOfWeek.Friday: return 'Vendredi';
-      case DayOfWeek.Saturday: return 'Samedi';
-      case DayOfWeek.Sunday: return 'Dimanche';
+      case DayOfWeek.MONDAY: return 'Lundi';
+      case DayOfWeek.TUESDAY: return 'Mardi';
+      case DayOfWeek.WEDNESDAY: return 'Mercredi';
+      case DayOfWeek.THURSDAY: return 'Jeudi';
+      case DayOfWeek.FRIDAY: return 'Vendredi';
+      case DayOfWeek.SATURDAY: return 'Samedi';
+      case DayOfWeek.SUNDAY: return 'Dimanche';
       default: return '';
     }
   }
-  /*getOpeningHours(day: DayOfWeek): OpeningHours {
-    return this.selectedCanteen?.openingHoursMap.get(day) || { open: null, close: null };
-  }*/
-
-  /*formatTime(time: string | null): string {
-    return time ? time.substring(0, 5) : 'Fermé';
-  }*/
-
-  /*getDaysOfWeek(): DayOfWeek[] {
-    return [
-      DayOfWeek.Monday,
-      DayOfWeek.Tuesday,
-      DayOfWeek.Wednesday,
-      DayOfWeek.Thursday,
-      DayOfWeek.Friday,
-      DayOfWeek.Saturday,
-      DayOfWeek.Sunday,
-    ];
-  }*/
-
 
   // Final submission
 
