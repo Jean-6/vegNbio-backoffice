@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {BookingService} from '../../../../_core/services/booking-service';
-import {AdminAsideMenu} from '../../../../_core/layout/admin-aside-menu/admin-aside-menu';
 import {DatePicker} from 'primeng/datepicker';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {InputNumber} from 'primeng/inputnumber';
@@ -9,13 +8,14 @@ import {MultiSelect} from 'primeng/multiselect';
 import {NavbarTop} from '../../../../_core/layout/navbar-top/navbar-top';
 import {Button} from 'primeng/button';
 import {Tag} from 'primeng/tag';
-import {DatePipe} from '@angular/common';
+import {CommonModule, DatePipe} from '@angular/common';
 import {TableModule} from 'primeng/table';
 import {Loader} from '../../../../_core/layout/loader/loader';
 import {AlertService} from '../../../../_core/services/alert-service';
-import {Booking} from '../../../../_core/dto/Booking';
+import { BookingView} from '../../../../_core/dto/booking';
 import {ResponseWrapper} from '../../../../_core/dto/responseWrapper';
 import {Tooltip} from 'primeng/tooltip';
+import {AsideMenuComponent} from '../../../../_core/layout/aside-menu-component/aside-menu-component';
 
 
 
@@ -28,10 +28,9 @@ export interface ReservationType {
 @Component({
   selector: 'app-booking-list-component',
   imports: [
-    AdminAsideMenu,
+    CommonModule,
     DatePicker,
     FormsModule,
-    InputNumber,
     InputText,
     MultiSelect,
     NavbarTop,
@@ -41,7 +40,8 @@ export interface ReservationType {
     DatePipe,
     TableModule,
     Loader,
-    Tooltip
+    Tooltip,
+    AsideMenuComponent
   ],
   templateUrl: './booking-list-component.html',
   standalone: true,
@@ -51,7 +51,7 @@ export class BookingListComponent implements OnInit{
 
   statuses: any[] | undefined;
   isLoading : boolean = false;
-  filteredReservations: Booking[] =[] ;
+  filteredReservations: BookingView[] =[] ;
   typeParams: ReservationType[] =[] ;
 
   constructor(protected bookingService: BookingService,
@@ -72,12 +72,13 @@ export class BookingListComponent implements OnInit{
     this.isLoading = true;
     this.bookingService.loadReservations()
       .subscribe({
-        next: (res: ResponseWrapper<Booking[]>) => {
+        next: (res: ResponseWrapper<BookingView[]>) => {
           this.filteredReservations = res.data;
           this.isLoading = false;
         },
         error: (err: any) => {
-          console.log(`Error http when fetching canteens : ${err}`);
+          console.log(`Error http when fetching bookings : ${err}`);
+          this.isLoading = false;
         }
       });
   }

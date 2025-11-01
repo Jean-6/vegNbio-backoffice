@@ -16,7 +16,7 @@
   <div class="row flex-nowrap ">
     <!-- SideMenu -->
     <nav class="col-12 col-xs-3 col-md-3 col-xl-2 px-0 bg-dark text-white sidebar">
-      <app-admin-aside-menu/>
+      <app-aside-menu-component/>
     </nav>
 
     <main class="col">
@@ -61,7 +61,7 @@
                   />
                 </div>
 
-                <div class="col-lg-3 col-md-3 col-12">
+               <!-- <div class="col-lg-3 col-md-3 col-12">
                   <div>
                     <label class="form-label fw-bold">Restaurant</label>
                   </div>
@@ -75,9 +75,9 @@
                     placeholder="Selectionner un service"
                   >
                   </p-multiselect>
-                </div>
+                </div>-->
 
-                <div class="col-lg-3 col-md-3 col-12">
+                <!--<div class="col-lg-3 col-md-3 col-12">
                   <div>
                     <label class="form-label fw-bold">Pers.</label>
                   </div>
@@ -88,7 +88,7 @@
                     inputId="stacked"
                     mode="decimal"
                   ></p-inputnumber>
-                </div>
+                </div>-->
 
               </div>
 
@@ -159,7 +159,7 @@
 
               <div class="row py-3">
                 <div class="col-lg-4 col-md-6 col-12">
-                  <button class="btn btn-primary " type="button">Rechercher</button>
+                  <button class="btn btn-primary " type="button" (click)="loadReservation()">Rechercher</button>
                 </div>
               </div>
             </form>
@@ -170,12 +170,16 @@
 
 
       <div class="container-fluid py-4">
+        <div *ngIf="filteredReservations?.length; else noReservations" class="row g-4">
         <div class="card border-0 shadow rounded-3">
-          <div class="card-body p-sm-3">
+          <div class="card-body p-sm-3" style="max-height: 55vh; overflow-y:auto">
+
             <div class="row d-flex justify-content-start mt-3">
-              @if (isLoading) {
-                <app-loader></app-loader>
-              }
+              <app-loader *ngIf="isLoading"></app-loader>
+            </div>
+
+            <div class="row d-flex justify-content-start mt-3">
+
               <p-table
                 [paginator]="true"
                 [rowsPerPageOptions]="[5, 10, 20]"
@@ -258,6 +262,7 @@
                       <div class="d-flex align-items-center text-muted">
                         <i class="pi pi-calendar me-2 text-primary"></i>
                         {{ res.date | date: 'dd/MM/yyyy' }}
+                        <!-- {{ res.date |  date:'EEEE d MMMM y':'':'fr'}}-->
                       </div>
                     </td>
 
@@ -286,20 +291,23 @@
                   </tr>
                 </ng-template>
 
-                <!-- EMPTY MESSAGE -->
-                <!--<ng-template pTemplate="emptymessage">
-                  <tr>
-                    <td class="text-center text-muted py-4" colspan="6">
-                      <i class="pi pi-info-circle me-2"></i>
-                      Aucune réservation trouvée
-                    </td>
-                  </tr>
-                </ng-template>-->
               </p-table>
 
             </div>
           </div>
         </div>
+
+      </div>
+
+        <ng-template #noReservations>
+          <div class="flex flex-col items-center justify-center py-12 text-center text-gray-600">
+            <h3 class="text-lg font-medium mb-2">Aucune réservation trouvée</h3>
+            <p class="text-sm">Vous n’avez encore ajouté aucune réservation ou aucun résultat ne correspond à votre recherche.</p>
+          </div>
+        </ng-template>
+
+
+
       </div>
 
 
