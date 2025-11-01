@@ -1,59 +1,49 @@
-# VegNbioBackoffice
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.2.
+---
 
-## Development server
+## 🟠 Web Backoffice (Angular – PrimeNG – Bootstrap)
 
-To start a local development server, run:
+```markdown
+# 🧭 Veg'N Bio Backoffice Web (Admin / Restaurateur)
+
+Application web Angular dédiée à la **gestion** et au **pilotage** de la plateforme Veg'N Bio :
+- Gestion des utilisateurs, restaurants, repas, événements, réservations.
+- Interface d’administration complète avec tableaux, filtres et statistiques.
+
+---
+
+## 🚀 Fonctionnalités principales
+
+### 👨‍💼 Côté Admin
+- Gestion des utilisateurs (création, suppression, rôle).
+- Gestion globale des restaurants.
+- Gestion et modération des repas.
+- Suivi et modération des événements.
+- Visualisation des statistiques globales.
+- Création d’événements marketing (“Semaine du Bio”).
+
+### 👨‍🍳 Côté Restaurateur
+- Gestion de son propre restaurant.
+- Ajout / modification / suppression de repas.
+- Gestion des réservations et des participants.
+- Création d’événements locaux (soirées, brunchs, séminaires).
+- Consultation de ses statistiques locales.
+
+---
+
+## 🧱 Stack technique
+
+- **Angular 15.2**
+- **PrimeNG 15.4**
+- **Bootstrap 5**
+- **RxJS**
+- **Chart.js / Recharts pour les stats**
+- **Auth HTTP Interceptor (BasicAuth)**
+
+---
+
+## 📦 Installation
 
 ```bash
+npm install
 ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
