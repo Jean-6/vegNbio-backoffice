@@ -1,13 +1,14 @@
-import {Approval} from './canteen';
+import {Approval} from './approval';
+
 
 export class ProductFilter {
 
   name?: string ;
-  categories?: string[] ;
-  types?: string[] ;
+  category?: string[] ;
+  type?: string[] ;
   allergens?: string[] ;
-  startDateAdded?: Date ;
-  endDateAdded?: Date ;
+  startDate?: Date ;
+  endDate?: Date ;
   status?: string ;
   supplier?: string ;
 }

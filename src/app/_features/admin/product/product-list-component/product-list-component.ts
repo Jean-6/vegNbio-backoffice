@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {AdminAsideMenu} from '../../../../_core/layout/admin-aside-menu/admin-aside-menu';
 import {DatePicker} from 'primeng/datepicker';
 import {FormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
@@ -10,33 +9,21 @@ import {ProductService} from '../../../../_core/services/product-service';
 import {CommonModule} from '@angular/common';
 import {AlertService} from '../../../../_core/services/alert-service';
 import {ResponseWrapper} from '../../../../_core/dto/responseWrapper';
-import {Offer} from '../../../../_core/dto/offer';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
 import {Loader} from '../../../../_core/layout/loader/loader';
-import {StatusOption} from '../../event/event-list-component/event-list-component';
 import {Image} from 'primeng/image';
+import {ParamService} from '../../../../_core/services/param-service';
+import {SelectItem} from '../../../../_core/dto/selectItem';
+import {AsideMenuComponent} from '../../../../_core/layout/aside-menu-component/aside-menu-component';
+import {Product} from '../../../../_core/dto/product';
+import {ERole} from '../../../../_core/dto/eRole';
+import {AuthService} from '../../../../_core/services/auth-service';
 
-
-export interface AllergenOption {
-  label: string;
-  value: string;
-}
-
-export interface TypeOption{
-  label: string;
-  value: string;
-}
-
-export interface CategoryOption{
-  label: string;
-  value: string;
-}
 @Component({
   selector: 'app-product-list-component',
   imports: [
     CommonModule,
-    AdminAsideMenu,
     DatePicker,
     FormsModule,
     InputText,
@@ -47,52 +34,72 @@ export interface CategoryOption{
     Button,
     Dialog,
     Image,
+    AsideMenuComponent,
   ],
   templateUrl: './product-list-component.html',
   standalone: true,
   styleUrl: './product-list-component.css'
 })
-export class ProductListComponent implements OnInit{
+export class ProductListComponent implements OnInit {
   isLoading: boolean = false;
-  offers: Offer[] = [];
-  selectedOffer: Offer | null = null;
-  visible: boolean =  false ;
-  allergenParams: AllergenOption[] = [];
-  typeParams: TypeOption[] = [];
-  categoryParams: CategoryOption[] = [];
-  statusParams: StatusOption[] = [];
+  products: Product[] = [];
+  selectedProduct: Product | null = null;
+  visible: boolean = false;
+  allergenParams: SelectItem[] = [];
+  typeParams: SelectItem[] = [];
+  categoryParams: SelectItem[] = [];
+  statusParams: SelectItem[] = [];
+  isAdmin = false;
+  isRestorer = false;
 
   constructor(protected productService: ProductService,
-              private alertService: AlertService) {}
+              private alertService: AlertService,
+              private paramService: ParamService,
+              private authService: AuthService) {
+  }
 
 
   ngOnInit(): void {
-
-    this.loadCategoryOptions()
-    this.loadAllergenOptions()
-    this.loadTypeOptions()
+    this.chefIfAdmin()
+    this.loadProductCategory()
+    this.loadProductAllergen()
+    this.loadProductType()
     this.loadProductStatus()
     this.loadProducts()
   }
 
+  chefIfAdmin() {
+    this.isLoading = true;
+    this.authService.getCurrentUser().subscribe(user => {
+      if (user) {
+        this.isLoading = false;
+        this.isAdmin = user.roles?.includes(ERole.ADMIN);
+         this.isRestorer = user.roles?.includes(ERole.RESTORER);
+      } else {
+        this.isAdmin = false;
+        this.isRestorer = false;
+      }
+    });
+  }
+
   loadProducts() {
     this.isLoading = true;
-    this.productService.loadProducts()
+    this.productService.loadProducts(this.productService.productFilter)
       .subscribe({
-        next: (res: ResponseWrapper<Offer[]>) => {
-          this.offers = res.data;
-          console.log("offers : "+this.offers)
+        next: (res: ResponseWrapper<Product[]>) => {
+          this.products = res.data;
+          console.log("products : " + this.products)
           this.isLoading = false;
         },
         error: (err: any) => {
-          console.log(`Error http when fetching offers : ${err}`);
+          console.log(`Error http when fetching products : ${err}`);
         }
       });
   }
 
-  loadProductStatus(){
+  loadProductStatus() {
     this.isLoading = true;
-    this.productService.getEventStatus()
+    this.paramService.getApprovalStatuses()
       .subscribe({
         next: options => {
           this.statusParams = options;
@@ -104,9 +111,10 @@ export class ProductListComponent implements OnInit{
         }
       })
   }
-  loadAllergenOptions(){
+
+  loadProductAllergen() {
     this.isLoading = true;
-    this.productService.getProductAllergens()
+    this.paramService.getAllergens()
       .subscribe({
         next: options => {
           this.allergenParams = options;
@@ -119,9 +127,9 @@ export class ProductListComponent implements OnInit{
       })
   }
 
-  loadTypeOptions(){
+  loadProductType() {
     this.isLoading = true;
-    this.productService.getProductTypes()
+    this.paramService.getProductTypes()
       .subscribe({
         next: options => {
           this.typeParams = options;
@@ -135,9 +143,9 @@ export class ProductListComponent implements OnInit{
       })
   }
 
-  loadCategoryOptions(){
+  loadProductCategory() {
     this.isLoading = true;
-    this.productService.getProductCategories()
+    this.paramService.getProductCategories()
       .subscribe({
         next: options => {
           this.categoryParams = options;
@@ -150,9 +158,16 @@ export class ProductListComponent implements OnInit{
       })
   }
 
-  showDialog(offer: Offer) {
-    this.selectedOffer = offer;
+  showDialog(product: Product) {
+    this.selectedProduct = product;
     this.visible = true;
+  }
+
+  closeDialog() {
+    this.selectedProduct = null;
+    this.visible = false;
+
+
   }
 
 
