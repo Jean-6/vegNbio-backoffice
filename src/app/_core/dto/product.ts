@@ -10,6 +10,7 @@ export class ProductFilter {
   startDate?: Date ;
   endDate?: Date ;
   status?: string ;
+  origin?:string[]
   supplier?: string ;
 }
 

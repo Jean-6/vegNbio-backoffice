@@ -16,9 +16,13 @@ import {Image} from 'primeng/image';
 import {ParamService} from '../../../../_core/services/param-service';
 import {SelectItem} from '../../../../_core/dto/selectItem';
 import {AsideMenuComponent} from '../../../../_core/layout/aside-menu-component/aside-menu-component';
-import {Product} from '../../../../_core/dto/product';
+import {Product, ProductFilter} from '../../../../_core/dto/product';
 import {ERole} from '../../../../_core/dto/eRole';
 import {AuthService} from '../../../../_core/services/auth-service';
+import {Textarea} from 'primeng/textarea';
+import {Status} from '../../../../_core/dto/canteen';
+import {UserFilter} from '../../../../_core/dto/user';
+import {Chip} from 'primeng/chip';
 
 @Component({
   selector: 'app-product-list-component',
@@ -35,6 +39,8 @@ import {AuthService} from '../../../../_core/services/auth-service';
     Dialog,
     Image,
     AsideMenuComponent,
+    Textarea,
+    Chip,
   ],
   templateUrl: './product-list-component.html',
   standalone: true,
@@ -51,6 +57,10 @@ export class ProductListComponent implements OnInit {
   statusParams: SelectItem[] = [];
   isAdmin = false;
   isRestorer = false;
+  visibleRejectDialog = false;
+  rejectReason = '';
+
+  activeFilters: { key: keyof ProductFilter; label: string; value: string }[] = [];
 
   constructor(protected productService: ProductService,
               private alertService: AlertService,
@@ -61,6 +71,7 @@ export class ProductListComponent implements OnInit {
 
   ngOnInit(): void {
     this.chefIfAdmin()
+    this.resetFilters();
     this.loadProductCategory()
     this.loadProductAllergen()
     this.loadProductType()
@@ -82,17 +93,33 @@ export class ProductListComponent implements OnInit {
     });
   }
 
+
+  searchProducts(): void {
+    const filter = this.productService.filter;
+    if (filter.startDate && filter.endDate) {
+      if (filter.startDate > filter.endDate) {
+        this.alertService.warn("La date de début ne peut pas être supérieure à la date de fin.");
+        return; // Bloque la recherche
+      }
+    }
+
+    this.loadProducts();
+  }
+
   loadProducts() {
+    this.products = []
     this.isLoading = true;
-    this.productService.loadProducts(this.productService.productFilter)
+    this.productService.loadProducts(this.productService.filter)
       .subscribe({
         next: (res: ResponseWrapper<Product[]>) => {
           this.products = res.data;
-          console.log("products : " + this.products)
+          this.updateActiveFilters()
           this.isLoading = false;
+          //this.hasSearched = true;
         },
         error: (err: any) => {
           console.log(`Error http when fetching products : ${err}`);
+          //this.hasSearched = true;
         }
       });
   }
@@ -125,6 +152,13 @@ export class ProductListComponent implements OnInit {
           this.alertService.error(`Error loading allergens param: ${err}`);
         }
       })
+  }
+
+  showRejectDialog(product?: Product | null): void {
+    //this.selectedProduct = product || null;
+    if(!product) return ;
+    this.rejectReason = '';
+    this.visibleRejectDialog = true;
   }
 
   loadProductType() {
@@ -171,7 +205,121 @@ export class ProductListComponent implements OnInit {
   }
 
 
-  updateApproval(selectedOffer: any, rejected: string) {
+  approveProduct(selectedProduct: Product | null): void {
+    if (!selectedProduct) return;
+
+    this.isLoading = true;
+
+    this.productService.approveProduct(selectedProduct).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.alertService.success('Produit approuvé avec succès.');
+        this.closeDialog();
+        this.loadProducts();
+        this.isLoading = false;
+      },
+      error: (error) => {
+
+        this.alertService.error('Impossible d’approuver le produit.')
+        console.error(error);
+      },
+    });
+  }
+
+  confirmReject(selectedProduct: Product | null): void {
+    if (!selectedProduct?.id) return;
+
+    if (!this.rejectReason.trim()) {
+      this.alertService.error('Veuillez entrer une raison de rejet.');
+      return;
+    }
+
+    this.isLoading = true;
+
+    this.productService.rejectProduct(selectedProduct,this.rejectReason).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.alertService.success('Produit rejeté avec succès.');
+        this.closeDialog();
+        this.loadProducts();
+        this.isLoading = false;
+      },
+      error: (error) => {
+
+        this.alertService.error('Impossible de rejeter le produit.')
+        console.error(error);
+      },
+    });
 
   }
+
+
+  updateActiveFilters(): void {
+    const f = this.productService.filter;
+    const filters: { key: keyof ProductFilter; label: string; value: string }[] = [];
+
+    if (f.name) {
+      filters.push({ key: 'name', label: 'Nom', value: f.name });
+    }
+    if (f.category && f.category.length > 0) {
+      filters.push({
+        key: 'category',
+        label: 'Catégorie',
+        value: f.category.join(', ')
+      });
+    }
+    if (f.type && f.type.length > 0) {
+      filters.push({
+        key: 'type',
+        label: 'Type',
+        value: f.type.join(', ')
+      });
+    }
+    if (f.startDate) {
+      filters.push({
+        key: 'startDate',
+        label: 'Date début',
+        value: f.startDate.toLocaleDateString()
+      });
+    }
+    if (f.endDate) {
+      filters.push({
+        key: 'endDate',
+        label: 'Date fin',
+        value: f.endDate.toLocaleDateString()
+      });
+    }
+    if (f.origin) {
+      filters.push({
+        key: 'origin',
+        label: 'Origine',
+        value: f.origin.join(', ')
+      });
+    }
+
+    this.activeFilters = filters;
+  }
+
+  removeFilter(key: keyof ProductFilter): void {
+    (this.productService.filter as any)[key] = key.endsWith('s') ? [] : undefined;
+    this.loadProducts();
+  }
+
+
+  resetFilters(): void {
+    this.productService.filter = {
+      name: '',
+      category: [],
+      type: [],
+      //minPrice: undefined,
+      //maxPrice: undefined,
+      //origin: [],
+      startDate: undefined,
+      endDate: undefined
+    };
+    this.activeFilters = [];
+  }
+
+  hasSearched: boolean = false;
+  protected readonly Status = Status;
 }
