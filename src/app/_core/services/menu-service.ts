@@ -40,13 +40,26 @@ export class MenuService {
 
   getItemsMenu(filter?:MenuItemFilter): Observable<ResponseWrapper<MenuItem[]>> {
     let params = new HttpParams();
-    if (filter) {
+    /*if (filter) {
       Object.entries(filter).forEach(([key, value]) => {
         if (value ! == undefined && value !== null && value !== '') {
           params = params.set(key, value.toString());
         }
       });
+    }*/
+
+    if (filter) {
+      Object.entries(filter).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          if (Array.isArray(value)) {
+            value.forEach(v => params = params.append(key, v));
+          } else {
+            params = params.set(key, value.toString());
+          }
+        }
+      });
     }
+
 
     if (this.authService.isAdmin()) {
       return this.http.get<ResponseWrapper<MenuItem[]>>(`${this.baseUrl}/api/menu`, {params});

@@ -30,7 +30,7 @@ export interface Meal extends MenuItem {
 
 export class MenuItemFilter {
 
-  itemType?: string;
+  itemType?: string[] ;
   itemName ?: string;
   canteenName? : string;
   //allergens?: [];
@@ -38,6 +38,7 @@ export class MenuItemFilter {
   maxPrice?: number;
   //tags?: string[];
   //foodType?: string;
+
 }
 
 
