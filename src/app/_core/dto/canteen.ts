@@ -26,12 +26,6 @@ export enum DayOfWeek {
 }
 
 
-
-export interface Contact{
-  phone: string;
-  email: string;
-}
-
 export interface Canteen {
   id: string;
   name: string;

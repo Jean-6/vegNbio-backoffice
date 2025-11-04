@@ -253,6 +253,17 @@ export class AddCanteenComponent implements OnInit {
     }
   }
 
+
+  private toLocalTimeString(date: any): string | null {
+    if (!date || isNaN(new Date(date).getTime())) return null;
+    const d = new Date(date);
+    const hours = d.getHours().toString().padStart(2, '0');
+    const minutes = d.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
+
+
   // Final submission
   onSubmit() {
     const openingHoursMap: Record<string, any> = {};
@@ -263,8 +274,8 @@ export class AddCanteenComponent implements OnInit {
         if (enumDay) {
 
           openingHoursMap[enumDay] = {
-            open: dayGroup.open,
-            close: dayGroup.close,
+            open: this.toLocalTimeString(dayGroup.open),
+            close: this.toLocalTimeString(dayGroup.close),
           };
         }
       }
@@ -291,7 +302,7 @@ export class AddCanteenComponent implements OnInit {
     };
 
 
-    console.log("before ading : ",canteenData)
+    console.log('📦 Sending AddCanteen JSON:', JSON.stringify(canteenData, null, 2));
 
     const files = this.mediaForm.get('pictures')?.value || [];
 

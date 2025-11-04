@@ -235,7 +235,7 @@
                           <span>  <i [class]="option.icon + 'text-xl text-gray-700'"></i> </span>
 
                           <div class="flex-1 flex flex-col">
-                            <span class="font-medium text-sm">{{ option.label }}</span>
+                            <strong><span class="font-medium text-sm">{{ option.label }}</span></strong>
                             <span
                               [ngClass]="{
                           'text-surface-500': !selected,
@@ -244,7 +244,7 @@
                           }"></span
                             >
                           </div>
-                          <span class="font-bold sm:ml-8">{{ option.value }}</span>
+                          <strong><span class="font-bold sm:ml-8">{{ option.value }}</span></strong>
                         </div>
                       </ng-template>
                     </p-picklist>

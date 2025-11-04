@@ -14,8 +14,6 @@ import {Approval} from '../dto/approval';
 })
 export class CanteenService {
 
-
-
   filters: CanteenFilter ={} ;
   private readonly baseUrl = `${environment.apiUrl}`;
   private readonly canteenEndpoint =`${this.baseUrl}/api/canteen`;
