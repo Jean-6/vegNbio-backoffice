@@ -1,4 +1,5 @@
-import {Role} from './Role';
+import {Role} from './role';
+import {Approval} from './approval';
 
 
 export interface User {
@@ -8,10 +9,25 @@ export interface User {
   roles : Role[];
   token: string;
   active: boolean;
-  isVerified: boolean;
-  docs : string[]
-
+  restorerInfo?: RestorerInfo;
+  supplierInfo?: SupplierInfo;
+  createdAt : Date;
 }
+export interface RestorerInfo{
+  docsUrl?: string[];
+  approval: Approval;
+  submittedAt : Date;
+}
+
+export interface SupplierInfo{
+  companyName: string;
+  phoneNumber: string;
+  docsUrl?: string[];
+  approval: Approval;
+  submittedAt : Date;
+}
+
+
 export class UserFilter {
 
   status?: string[] ;
@@ -21,8 +37,8 @@ export class UserFilter {
 }
 
 
-
 export interface UserInfo{
+  userId: string;
   login:string;
   username:string;
   email:string;

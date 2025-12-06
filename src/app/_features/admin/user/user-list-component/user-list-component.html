@@ -198,7 +198,7 @@
                           (click)="showDialog(user)"
                           [outlined]="true"
                           [rounded]="true"
-                          icon="pi pi-pencil"
+                          icon="pi pi-eye"
                           pTooltip="Modifier"
                           severity="info"
                           tooltipPosition="top"
@@ -232,6 +232,7 @@
                   <p-card>
                     <div class="flex flex-column">
                       <!-- Info utilisateur -->
+
                       <div class="flex justify-content-between align-items-center">
                         <div>
                           <p><strong>Login :</strong>
@@ -256,11 +257,14 @@
                           </p>
                         </div>
 
+
+
                         <!-- PDF utilisateur -->
-                        <p-panel header="Documents utilisateurs" [toggleable]="true" [collapsed]="true">
+                        <!--<p-panel header="Documents utilisateurs" [toggleable]="true" [collapsed]="true">
                           <h5 class="font-medium mb-3">Documents de vérification</h5>
+                          <ng-container *ngIf="selectedUser?.restorerInfo?.docsUrl?.length" class="my-2">
                           <div class="grid md:grid-cols-2 gap-4">
-                            <ng-container *ngFor="let doc of selectedUser.docs; let i = index" >
+                            <ng-container *ngFor="let doc of selectedUser?.restorerInfo?.docsUrl; let i = index" >
                               <p-card [header]="" class="shadow-sm border" >
                                 <div class="flex flex-col items-center justify-center">
                                   <pdf-viewer
@@ -275,23 +279,47 @@
                                 </div>
                               </p-card>
                             </ng-container>
-
-                            <ng-container *ngIf="!selectedUser.docs?.length">
-                              <p class="text-sm text-color-secondary italic">Aucun document disponible</p>
-                            </ng-container>
                           </div>
-                        </p-panel>
+                          </ng-container>
+
+                          <ng-container *ngIf="selectedUser?.supplierInfo?.docsUrl?.length">
+                            <div class="grid md:grid-cols-2 gap-4">
+                              <ng-container *ngFor="let doc of selectedUser?.supplierInfo?.docsUrl; let i = index" >
+                                <p-card [header]="" class="shadow-sm border" >
+                                  <div class="flex flex-col items-center justify-center">
+                                    <pdf-viewer
+
+                                      [original-size]="false"
+                                      [render-text]="true"
+                                      [src]="doc"
+                                      style="width:100%; height:400px; border:1px solid #ddd; border-radius:8px">
+                                    </pdf-viewer>
+                                    <a [href]="doc" class="mt-2 text-primary underline" target="_blank">Ouvrir dans un
+                                      nouvel onglet</a>
+                                  </div>
+                                </p-card>
+                              </ng-container>
+                            </div>
+                          </ng-container>
+
+                          Aucun document
+                          <ng-container *ngIf="!selectedUser?.supplierInfo?.docsUrl?.length && !selectedUser?.restorerInfo?.docsUrl?.length">
+                              <p class="text-sm text-color-secondary italic">Aucun document disponible</p>
+                          </ng-container>
+                        </p-panel>-->
                       </div>
 
 
+
+
                       <div class="d-flex align-content-between my-2">
-                        <p-button
+                        <!--<p-button
                           (onClick)="verifyUser(selectedUser)"
-                          [disabled]="selectedUser.isVerified"
+
                           [severity]="'success'"
                           icon="pi pi-check-circle"
                           label="Marquer comme vérifié">
-                        </p-button>
+                        </p-button>--><!-- [disabled]="selectedUser.isVerified"-->
                         <p-button
                           (click)="toggleActive(selectedUser)"
                           [severity]="selectedUser.active ? 'danger' : 'help'"

@@ -5,6 +5,8 @@ import {Observable, throwError} from 'rxjs';
 import {ResponseWrapper} from '../dto/responseWrapper';
 import {environment} from '../../../environments/environment';
 import {AuthService} from './auth-service';
+import {RoleChangeRequest} from '../dto/roleRequest';
+import {Role} from '../dto/role';
 
 
 export interface UploadResponse {
@@ -23,6 +25,32 @@ export class UserService {
 
   constructor(private http: HttpClient,
               private authService: AuthService) {}
+
+
+
+  loadRoleChanges(filter?:UserFilter): Observable<ResponseWrapper<RoleChangeRequest[]>> {
+
+    let params = new HttpParams();
+
+    if (filter) {
+      Object.entries(filter).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          if (Array.isArray(value)) {
+            value.forEach(v => {
+              params = params.append(key, v);
+            });
+          } else {
+            params = params.set(key, value.toString());
+          }
+        }
+      });
+    }
+    if (this.authService.isAdmin()) {
+      return this.http.get<ResponseWrapper<RoleChangeRequest[]>>(`${this.userEndpoint}/role-change-requests`, {params});
+    }
+
+    return throwError(() => new Error('Accès non autorisé'));
+  }
 
 
   loadUsers(filter?:UserFilter): Observable<ResponseWrapper<User[]>> {
@@ -72,4 +100,29 @@ export class UserService {
       this.filters[field] = undefined;
     }
   }
+
+  submitRoleChangeRequest(requestDto: RoleChangeRequest, documents: File[]): Observable<any> {
+    const formData = new FormData();
+
+    formData.append(
+      'data',
+      new Blob([JSON.stringify(requestDto)], {type: 'application/json'})
+    );
+
+    documents.forEach(file => {
+      formData.append('documents', file);
+    });
+
+    return this.http.post(`${this.userEndpoint}/become-restorer`, formData);
+  }
+
+  approveRoleRequest(request: RoleChangeRequest, adminComment?: string): Observable<RoleChangeRequest> {
+    const params = adminComment ? { params: { adminComment } } : {};
+    return this.http.put<RoleChangeRequest>(
+      `${this.userEndpoint}/${request.userInfo?.userId}/role-requests/approve`,
+      {},
+      params
+    );
+  }
+
 }

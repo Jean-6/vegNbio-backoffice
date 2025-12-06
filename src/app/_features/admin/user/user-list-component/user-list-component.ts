@@ -44,7 +44,7 @@ import {Chip} from 'primeng/chip';
     AsideMenuComponent,
     Card,
     PdfViewerModule,
-    Panel,
+    //Panel,
     Select,
     AutoComplete,
     Chip,
@@ -184,7 +184,6 @@ export class UserListComponent implements OnInit{
     this.userService.toggleActive(selectedUser.id)
       .subscribe({
         next:(user : ResponseWrapper<User>)=>{
-          console.log(user.data);
           selectedUser.active = user.data.active;
           this.isLoading = false;
           this.alertService.success("User account activated")
@@ -204,7 +203,7 @@ export class UserListComponent implements OnInit{
     this.userService.verifyUser(selectedUser.id)
       .subscribe({
         next:(data : ResponseWrapper<User>)=>{
-          selectedUser.isVerified = true;
+          //selectedUser.isVerified = true;
           this.isLoading = false;
           this.alertService.success("User approved")
           this.closeDialog()
