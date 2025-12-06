@@ -2,9 +2,7 @@ import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Step, StepList, StepPanel, StepPanels, Stepper} from 'primeng/stepper';
 import {NavbarTop} from '../../../../_core/layout/navbar-top/navbar-top';
-import {AdminAsideMenu} from '../../../../_core/layout/admin-aside-menu/admin-aside-menu';
 import {Button} from 'primeng/button';
-import {AnimateOnScroll} from 'primeng/animateonscroll';
 import {FileSelectEvent, FileUpload, FileUploadEvent} from 'primeng/fileupload';
 import {AutoFocus} from 'primeng/autofocus';
 import {Textarea} from 'primeng/textarea';
@@ -22,9 +20,11 @@ import { CommonModule } from '@angular/common';
 import {PrimeTemplate} from 'primeng/api';
 import {Checkbox} from 'primeng/checkbox';
 import {Loader} from '../../../../_core/layout/loader/loader';
-import {AddMenuItem} from '../../../../_core/dto/addMenuItem';
 import {MenuService} from '../../../../_core/services/menu-service';
 import {RouterLink} from '@angular/router';
+import {AsideMenuComponent} from '../../../../_core/layout/aside-menu-component/aside-menu-component';
+import {animate, style, transition, trigger} from '@angular/animations';
+import {AddMenuItem} from '../../../../_core/dto/menuItem';
 
 
 export const drinkVolumes: SelectItem[] = [
@@ -32,9 +32,6 @@ export const drinkVolumes: SelectItem[] = [
   { label: "33 cl", value: "330ml" },
   { label: "50 cl", value: "500ml" },
   { label: "75 cl", value: "750ml" },
-  //{ label: "1 L", value: "1l" },
-  //{ label: "1.5 L", value: "1.5l" },
-  //{ label: "2 L", value: "2l" }
 ];
 
 @Component({
@@ -43,19 +40,16 @@ export const drinkVolumes: SelectItem[] = [
     CommonModule,
     Step,
     NavbarTop,
-    AdminAsideMenu,
     Stepper,
     StepList,
     StepPanels,
     ReactiveFormsModule,
     StepPanel,
     Button,
-    AnimateOnScroll,
     AutoFocus,
     Textarea,
     Select,
     InputText,
-    AutoComplete,
     KeyFilter,
     PickList,
     PrimeTemplate,
@@ -63,10 +57,22 @@ export const drinkVolumes: SelectItem[] = [
     FileUpload,
     Loader,
     RouterLink,
+    AsideMenuComponent,
   ],
   templateUrl: './add-menu-component.html',
   standalone: true,
-  styleUrl: './add-menu-component.css'
+  styleUrl: './add-menu-component.css',
+  animations:[
+    trigger('fadeAnimation',[
+      transition(':enter',[
+        style({opacity:0}),
+        animate('300ms ease-out', style({opacity: 1}))
+      ]),
+      transition(':leave',[
+        animate('300ms ease-in', style({opacity: 0 }))
+      ])
+    ])
+  ]
 })
 export class AddMenuComponent implements  OnInit{
 
@@ -88,14 +94,11 @@ export class AddMenuComponent implements  OnInit{
   sourceAllergens: SelectItem[] = [];
   targetAllergens: SelectItem[] = [];
 
-
-  selectedVolume: SelectItem[] = [];
   drinkVolumes = drinkVolumes;
 
 
 
   private initForms() {
-
     this.infoForm = this.formBuilder.group({
       itemType: new FormControl('', Validators.required),
       canteen: ['', Validators.required],
@@ -161,12 +164,11 @@ export class AddMenuComponent implements  OnInit{
     const v = this.infoForm.get('itemType')?.value;
     if (!v) return null;
     if (typeof v === 'string') return v;
-    // si c'est un objet { value: '...', label: '...' }
     if (v.value) return v.value;
-    // si c'est un objet brut, tenter d'inférer
     if (v.label && v.label.toLowerCase) return v.label.toString().toLowerCase();
     return null;
   }
+
 
 
   constructor(protected menuService: MenuService,
@@ -182,7 +184,7 @@ export class AddMenuComponent implements  OnInit{
   ngOnInit(): void {
 
     this.loadMenuItemType()
-    this.loadCanteenParams()
+    this.loadOwnCanteensParams()
     this.loadMenuIngredients()
     this.loadMenuAllergens()
     this.loadFoodType()
@@ -193,7 +195,6 @@ export class AddMenuComponent implements  OnInit{
     this.loading = true;
     this.paramService.getMenuItemType().subscribe({
       next:(type)=> {
-        console.log(type)
         this.menuItemTypes = type;
         this.loading = false
       },
@@ -204,14 +205,18 @@ export class AddMenuComponent implements  OnInit{
     });
   }
 
-  loadCanteenParams(){
+  loadOwnCanteensParams(){
     this.loading = true;
-    this.paramService.getCanteens()
+    this.paramService.getOwnCanteensApproved()
       .subscribe({
         next: (options: ResponseWrapper<SelectCanteen[]>) => {
           this.canteenParams = options.data;
           this.filteredCanteen = [...options.data];
           this.loading = false;
+
+          if (!this.filteredCanteen || this.filteredCanteen.length === 0) {
+            this.alertService.warn("Aucun restaurant trouvé.");
+          }
         },
         error: err => {
           console.error('Error loading service param:', err);
@@ -355,8 +360,8 @@ export class AddMenuComponent implements  OnInit{
     const addMenuItemData: AddMenuItem = {
 
       itemType: this.itemType?.value?.value,
-      canteenId: this.canteen?.value ?? '',
-      name:  this.name?.value ?? '',
+      canteenId: this.canteen?.value?.id ?? '',
+      itemName:  this.name?.value ?? '',
       desc: this.desc?.value,
       price: this.price?.value,
       userId: this.authService.getUserId(),
@@ -372,7 +377,6 @@ export class AddMenuComponent implements  OnInit{
         this.targetIngredients.map(item => item.value) : [],
       allergens: this.selectedType === 'meal' ?
         this.targetAllergens.map(item => item.value) : [],
-      //foodType: this.selectedType === 'meal' ? this.foodType?.value : null,
     }
 
     const files = this.mediaForm.get('pictures')?.value || [];
@@ -401,5 +405,7 @@ export class AddMenuComponent implements  OnInit{
     this.selectedFiles = [];
     this.loading = false;
   }
+
+
 
 }

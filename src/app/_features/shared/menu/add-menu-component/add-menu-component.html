@@ -16,7 +16,7 @@
   <div class="row flex-nowrap ">
     <!-- SideMenu -->
     <nav class="col-12 col-xs-3 col-md-3 col-xl-2 px-0 bg-dark text-white sidebar">
-      <app-admin-aside-menu/>
+      <app-aside-menu-component/>
     </nav>
 
     <main class="col">
@@ -41,35 +41,121 @@
             <ng-template #content let-activateCallback="activateCallback">
               <div
                 class="max-w-lg mx-auto min-h-[50rem] flex flex-col"
-                enterClass="animate-enter fade-in-10 zoom-in-75 animate-duration-1000"
-                leaveClass="animate-leave fade-out-0"
-                pAnimateOnScroll
+                [@fadeAnimation]
               >
                 <h3 class="text-left text-2xl fw-bold text-primary mt-2 mb-4">📌 Informations générales</h3>
                 <app-loader *ngIf="loading"></app-loader>
-                <form [formGroup]="infoForm">
-                  <div class="row gy-3">
+                <form [formGroup]="infoForm" class="d-flex flex-column gap-4">
 
-                    <div class="col-12 col-md-4 d-flex flex-column">
-                      <label class="fw-bold d-block">Type d'item*</label>
-                      <!--class="w-full md:w-56"-->
-                      <p-select [checkmark]="true" [options]="this.menuItemTypes" [showClear]="true"  formControlName="itemType" optionLabel="label" placeholder="Selectionne le type"/>
-                      @if (infoForm.get('itemType')?.invalid && infoForm.get('itemType')?.touched) {
-                        <div class="text-danger" style="font-size: 0.8rem">
+
+                  <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                      <div class="form-group d-flex flex-column">
+                        <label class="fw-bold mb-1">Type d'item*</label>
+                        <p-select
+                          [checkmark]="true"
+                          [options]="menuItemTypes"
+                          [showClear]="true"
+                          formControlName="itemType"
+                          optionLabel="label"
+                          placeholder="Sélectionne le type"
+                          class="w-75"
+                        ></p-select>
+                        <div *ngIf="infoForm.get('itemType')?.invalid && infoForm.get('itemType')?.touched"
+                             class="text-danger small mt-1">
+                          Type d'item obligatoire
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                      <div class="form-group d-flex flex-column">
+                        <label class="fw-bold mb-1">Nom du restaurant*</label>
+                        <p-select [options]="filteredCanteen"
+                                  formControlName="canteen"
+                                  optionLabel="name"
+                                  placeholder="Select a City"
+                                  class="w-50"
+                        />
+                        <!--<p-autocomplete
+                          (completeMethod)="search($event)"
+                          [suggestions]="filteredCanteen"
+                          formControlName="canteen"
+                          optionLabel="name"
+                          optionValue="id"
+                          class="w-50"
+                        ></p-autocomplete>-->
+                        <div *ngIf="infoForm.get('canteen')?.invalid && infoForm.get('canteen')?.touched"
+                             class="text-danger small mt-1">
                           Nom du restaurant obligatoire
                         </div>
-                      }
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Ligne 2 : Designation & Prix -->
+                  <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                      <div class="form-group d-flex flex-column">
+                        <label class="fw-bold mb-1">Désignation*</label>
+                        <input type="text" pInputText formControlName="name" class="form-control w-75" />
+                        <div *ngIf="infoForm.get('name')?.invalid && infoForm.get('name')?.touched"
+                             class="text-danger small mt-1">
+                          Nom d'item obligatoire
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                      <div class="form-group d-flex flex-column">
+                        <label class="fw-bold mb-1">Prix*</label>
+                        <input type="text" pInputText pKeyFilter="num" formControlName="price" class="form-control w-25"/>
+                        <div *ngIf="infoForm.get('price')?.invalid && infoForm.get('price')?.touched"
+                             class="text-danger small mt-1">
+                          Prix obligatoire
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Ligne 3 : Description -->
+                  <div class="row g-3">
+                    <div class="col-12">
+                      <div class="form-group d-flex flex-column">
+                        <label class="fw-bold mb-1">Description*</label>
+                        <textarea pTextarea formControlName="desc" rows="3" class="form-control w-50"></textarea>
+                        <div *ngIf="infoForm.get('desc')?.invalid && infoForm.get('desc')?.touched"
+                             class="text-danger small mt-1">
+                          Description obligatoire
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+
+
+                  <!--<div class="row g-3">
+                    <div class="col-12 col-md-6 d-flex flex-column">
+                      <label class="fw-bold mb-1">Type d'item*</label>
+                      <p-select [checkmark]="true"
+                                [options]="this.menuItemTypes"
+                                [showClear]="true"
+                                formControlName="itemType"
+                                optionLabel="label"
+                                placeholder="Selectionne le type"
+                                class="w-100"></p-select>
+                      <div *ngIf="infoForm.get('itemType')?.invalid && infoForm.get('itemType')?.touched" class="text-danger" style="font-size: 0.8rem">
+                        Type d'item obligatoire
+                      </div>
                     </div>
 
                     <div class="col-12 col-md-4 d-flex flex-column">
                       <label class="fw-bold d-block">Nom du restaurant*</label>
                       <p-autocomplete (completeMethod)="search($event)" [suggestions]="this.filteredCanteen"  formControlName="canteen" optionLabel="name" optionValue="id">
                       </p-autocomplete>
-                      @if (infoForm.get('canteen')?.invalid && infoForm.get('canteen')?.touched) {
-                        <div class="text-danger" style="font-size: 0.8rem">
-                          Nom du restaurant obligatoire
-                        </div>
-                      }
+                      <div *ngIf="infoForm.get('canteen')?.invalid && infoForm.get('canteen')?.touched" class="text-danger" style="font-size: 0.8rem">
+                        Nom du restaurant obligatoire
+                      </div>
                     </div>
                   </div>
 
@@ -77,20 +163,17 @@
                     <div class="col-12 col-md-4 d-flex flex-column">
                       <label class="fw-bold d-block">Designation</label>
                       <input type="text" pInputText formControlName="name" [fluid]="true" [pAutoFocus]="true"/>
-                      @if (infoForm.get('name')?.invalid && infoForm.get('name')?.touched) {
-                        <div class="text-danger" style="font-size: 0.8rem">
-                          Désignation obligatoire
-                        </div>
-                      }
+                      <div *ngIf="infoForm.get('name')?.invalid && infoForm.get('name')?.touched" class="text-danger" style="font-size: 0.8rem">
+                        Nom d'item obligatoire
+                      </div>
                     </div>
+
                     <div class="col-12 col-md-4 d-flex flex-column">
                       <label class="fw-bold d-block">Prix*</label>
-                      <input  class="form-label w-75" formControlName="price" pInputText pKeyFilter="num" type="text" [fluid]="true" [pAutoFocus]="true"/>
-                      @if (infoForm.get('price')?.invalid && infoForm.get('price')?.touched) {
-                        <div class="text-danger" style="font-size: 0.8rem">
-                          Prix obligatoire
-                        </div>
-                      }
+                      <input  class="" formControlName="price" pInputText pKeyFilter="num" type="text" [fluid]="true" [pAutoFocus]="true"/>
+                      <div *ngIf="infoForm.get('price')?.invalid && infoForm.get('price')?.touched" class="text-danger" style="font-size: 0.8rem">
+                        Prix obligatoire
+                      </div>
                     </div>
                   </div>
 
@@ -99,18 +182,24 @@
                       <label class="fw-bold d-block">Description*</label>
                       <textarea [fluid]="true" [pAutoFocus]="true" class="form-label" cols="50" formControlName="desc" pTextarea rows="3">
                       </textarea>
-                      @if (infoForm.get('desc')?.invalid && infoForm.get('desc')?.touched) {
-                        <div class="text-danger" style="font-size: 0.8rem">
-                          Description obligatoire
-                        </div>
-                      }
+                      <div *ngIf="infoForm.get('desc')?.invalid && infoForm.get('desc')?.touched" class="text-danger" style="font-size: 0.8rem">
+                        Description obligatoire
+                      </div>
                     </div>
-                  </div>
+                  </div>-->
 
                 </form>
                 <!-- Barre de navigation -->
-                <div class="flex justify-end pt-6 mt-auto">
+                <!--<div class="flex justify-end pt-6 mt-auto">
                   <p-button (onClick)="nextStep(infoForm,activateCallback,2)" icon="pi pi-arrow-right" iconPos="right" label="Suivant"/>
+                </div>-->
+                <div class="d-flex justify-content-start mt-4">
+                  <p-button
+                    (onClick)="nextStep(infoForm, activateCallback, 2)"
+                    icon="pi pi-arrow-right"
+                    iconPos="right"
+                    label="Suivant"
+                  ></p-button>
                 </div>
               </div>
 
@@ -124,9 +213,7 @@
             <ng-template #content let-activateCallback="activateCallback">
               <div
                 class="max-w-lg mx-auto min-h-[50rem] flex flex-col"
-                enterClass="animate-enter fade-in-10 zoom-in-75 animate-duration-1000"
-                leaveClass="animate-leave fade-out-0"
-                pAnimateOnScroll>
+                [@fadeAnimation]>
 
                 <h3 class="text-left text-2xl fw-bold text-primary mt-2 mb-4"></h3>
                   <h3 class="text-left text-2xl fw-bold text-primary mt-2 mb-4">Ingredients</h3>
@@ -143,12 +230,12 @@
                   >
                     <ng-template let-option pTemplate="item">
                       <div class="flex flex-wrap p-1 items-center gap-4 w-full">
-                        <i
+                        <!--<i
                           class="pi {{option.icon }}"
                           style="font-size: 1.5rem;">
-                        </i>
+                        </i>-->
                         <div class="flex-1 flex flex-col">
-                          <span class="font-medium text-sm">{{ option.label }}</span>
+                          <strong><span class="font-medium text-sm">{{ option.label }}</span></strong>
                         </div>
                       </div>
                     </ng-template>
@@ -169,7 +256,7 @@
                     <ng-template let-option pTemplate="item">
                       <div class="flex flex-wrap p-1 items-center gap-4 w-full">
                         <div class="flex-1 flex flex-col">
-                          <span class="font-medium text-sm">{{ option.label }}</span>
+                          <strong><span class="font-medium text-sm">{{ option.label }}</span></strong>
                         </div>
                       </div>
                     </ng-template>
@@ -193,7 +280,8 @@
             @if (selectedType === 'drink') {
               <p-step-panel [value]="2">
                 <ng-template #content let-activateCallback="activateCallback">
-                  <div class="max-w-lg mx-auto min-h-[50rem] flex flex-col">
+                  <div class="max-w-lg mx-auto min-h-[50rem] flex flex-col"
+                       [@fadeAnimation]>
 
                     <h3 class="text-left text-2xl fw-bold text-primary mt-2 mb-4">Détails sur boissons</h3>
                     <form [formGroup]="drinkForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
@@ -237,9 +325,7 @@
 
               <div
                 class="max-w-xl mx-auto min-h-[30rem] flex flex-col"
-                enterClass="animate-enter fade-in-10 zoom-in-75 animate-duration-1000"
-                leaveClass="animate-leave fade-out-0"
-                pAnimateOnScroll>
+                [@fadeAnimation]>
                 <app-loader *ngIf="loading"></app-loader>
                 <h3 class="text-left text-2xl fw-bold text-primary mt-4">🖼️ Médias</h3>
 
@@ -275,7 +361,8 @@
           <!-- Étape 5 : Confirmation -->
           <p-step-panel [value]="4">
             <ng-template #content let-activateCallback="activateCallback">
-              <div class="max-w-md mx-auto min-h-[18rem] flex flex-col items-center justify-center ">
+              <div class="max-w-md mx-auto min-h-[18rem] flex flex-col items-center justify-center "
+                   [@fadeAnimation]>
                 <h3 class="text-2xl font-bold text-green-600 ">✅ Produits rajoutés aux menus créé avec succès</h3>
                 <img alt="confirmation" class="mt-4 w-40"
                      src="https://primefaces.org/cdn/primeng/images/stepper/content.svg"/>
