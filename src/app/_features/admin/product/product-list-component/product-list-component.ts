@@ -21,7 +21,6 @@ import {ERole} from '../../../../_core/dto/eRole';
 import {AuthService} from '../../../../_core/services/auth-service';
 import {Textarea} from 'primeng/textarea';
 import {Status} from '../../../../_core/dto/canteen';
-import {UserFilter} from '../../../../_core/dto/user';
 import {Chip} from 'primeng/chip';
 
 @Component({
@@ -311,9 +310,6 @@ export class ProductListComponent implements OnInit {
       name: '',
       category: [],
       type: [],
-      //minPrice: undefined,
-      //maxPrice: undefined,
-      //origin: [],
       startDate: undefined,
       endDate: undefined
     };

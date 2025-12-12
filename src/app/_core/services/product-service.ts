@@ -30,8 +30,6 @@ export class ProductService {
 
   loadProducts(filter?: ProductFilter): Observable<ResponseWrapper<Product[]>> {
 
-
-
     let params = new HttpParams();
 
 
