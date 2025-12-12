@@ -2,14 +2,13 @@ import {Component, OnInit} from '@angular/core';
 import {InputText} from 'primeng/inputtext';
 import {Loader} from '../../../_core/layout/loader/loader';
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {Router, RouterOutlet} from '@angular/router';
+import {Router, RouterLink, RouterOutlet} from '@angular/router';
 import {finalize, Subject, takeUntil} from 'rxjs';
-import {LoginResponse} from '../../../_core/dto/loginResponse';
 import {AuthService} from '../../../_core/services/auth-service';
 import {AlertService} from '../../../_core/services/alert-service';
-import {LoginRequest} from '../../../_core/dto/loginRequest';
 import {ERole} from '../../../_core/dto/eRole';
 import {AutoFocus} from 'primeng/autofocus';
+import {LoginRequest, LoginResponse} from '../../../_core/dto/auth';
 
 @Component({
   selector: 'app-signin-component',
@@ -18,7 +17,8 @@ import {AutoFocus} from 'primeng/autofocus';
     Loader,
     ReactiveFormsModule,
     RouterOutlet,
-    AutoFocus
+    AutoFocus,
+    RouterLink
   ],
   templateUrl: './signin-component.html',
   standalone: true,
@@ -63,9 +63,11 @@ export class SigninComponent implements OnInit{
         const roles: string[] = (res.roles ?? []).map(r => r.role);
 
         if (roles.includes(ERole.ADMIN)) {
-          this.router.navigateByUrl('/admin-dashboard');
+          this.router.navigateByUrl('/canteen-list');
+          //this.router.navigateByUrl('/admin-dashboard');
         } else if (roles.includes(ERole.RESTORER)) {
-          this.router.navigateByUrl('/restorer-dashboard');
+          this.router.navigateByUrl('/canteen-list');
+          //this.router.navigateByUrl('/restorer-dashboard');
         } else {
 
           this.router.navigateByUrl('/sign-in');
