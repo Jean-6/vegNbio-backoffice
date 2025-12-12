@@ -5,7 +5,7 @@ import {
 import {AuthService} from '../services/auth-service';
 import {inject} from '@angular/core';
 import {map, take, } from 'rxjs';
-import { ERole } from '../models/ERole'
+import { ERole } from '../dto/eRole'
 
 export const adminGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
@@ -17,7 +17,7 @@ export const adminGuard: CanActivateFn = () => {
       console.log("Guard 1: user from service =", user);
 
       if (!user || !user.roles || user.roles.length === 0) {
-        console.log("Guard 2: trying localStorage fallback");
+        console.error("Guard 2: trying localStorage fallback");
         const stored = localStorage.getItem('currentUser');
         if (stored) {
 

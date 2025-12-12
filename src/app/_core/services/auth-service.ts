@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
-import {BehaviorSubject, catchError, map, Observable, tap, throwError} from 'rxjs';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, catchError, map, Observable, of, tap, throwError} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
-import {LoginRequest} from '../dto/loginRequest';
-import {LoginResponse} from '../dto/loginResponse';
 import {ResponseWrapper} from '../dto/responseWrapper';
 import {environment} from '../../../environments/environment';
-import {ERole} from '../models/eRole';
+import {ERole} from '../dto/eRole';
+import {RegisterRequest} from '../dto/registerRequest';
+import {LoginRequest, LoginResponse} from '../dto/auth';
 
 @Injectable({
   providedIn: 'root'
@@ -13,13 +13,10 @@ import {ERole} from '../models/eRole';
 export class AuthService {
 
 
-  private urlLogin_ = "/auth/sign-in";
-  private urlRegister_ = "/auth/register";
-  private logout_ = "/auth/logout";
-  private apiUrlRefreshToken = "/auth/refresh-token";
+  private apiUrlAuth = "/api/auth"
   isLoading = false;
-  private currentUser$ = new BehaviorSubject<{id: string, username: string, roles: ERole[]} | null>(null); //To stock user connected state
-  private isAuthenticated$ = new BehaviorSubject<boolean>(false);
+  private currentUser$ = new BehaviorSubject<{id: string, username: string, roles: ERole[],isActive: boolean, isVerified:boolean} | null>(null); //To stock user connected state
+  private isAuthenticated$ = new BehaviorSubject<boolean>(false)
 
   constructor(private _httpClient: HttpClient) {
     const stored = localStorage.getItem('currentUser');
@@ -32,7 +29,7 @@ export class AuthService {
   }
 
 
-  getCurrentUser(): Observable<{ id: string,username: string, roles: ERole[] } | null>{
+  getCurrentUser(): Observable<{ id: string,username: string, roles: ERole[], isActive: boolean, isVerified: boolean } | null>{
     return this.currentUser$.asObservable();
   }
 
@@ -41,7 +38,7 @@ export class AuthService {
     return this.isAuthenticated$.asObservable();
   }
 
-  setCurrentUser(user : {id: string,username: string, roles: any[]}  | null): void{
+  setCurrentUser(user : {id: string,username: string, roles: any[], isActive: boolean, isVerified: boolean}  | null): void{
     this.currentUser$.next(user);
   }
 
@@ -49,16 +46,13 @@ export class AuthService {
     this.isAuthenticated$.next(value);
   }
 
-  isAdmin(): boolean{
-    return this.currentUser$.value?.roles.includes(ERole.ADMIN) ?? false ;
-  }
 
   getUserRoles(): string[] {
     const user = this.currentUser$.value ?? JSON.parse (localStorage.getItem('currentUser') || 'null');
     return user?.roles ?? [];
   }
   getAccessToken(): string | null {
-    return localStorage.getItem("accessToken");
+    return localStorage.getItem("token");
   }
   getRefreshToken(): string | null {
     return localStorage.getItem("refreshToken");
@@ -70,15 +64,27 @@ export class AuthService {
   }
 
 
+  getSupplierStatus(): string | null {
+    const user = this.currentUser$.getValue() ?? JSON.parse(localStorage.getItem('currentUser') || 'null');
+    return user?.supplierInfo?.approval?.status ?? null;
+  }
+
+  canAccessOnlyProfile(): boolean {
+    const status = this.getSupplierStatus();
+    return status === 'PENDING' || status === 'REJECTED';
+  }
+
   login(loginRequest: LoginRequest): Observable<LoginResponse> {
+
     return this._httpClient.post<ResponseWrapper<LoginResponse>>(
-      `${environment.apiUrl}${this.urlLogin_}`,
+      `${environment.apiUrl}${this.apiUrlAuth}/sign-in`,
       loginRequest,
       {withCredentials: true}
     ).pipe(
       tap((response: ResponseWrapper<LoginResponse>) => {
-        if (response.data.accessToken) {
-          localStorage.setItem('accessToken', response.data.accessToken);
+        console.log("response : "+ response.data.token)
+        if (response.data.token) {
+          localStorage.setItem('token', response.data.token);
         }
 
         const roles: ERole[] = (response.data.roles ?? [])
@@ -88,7 +94,9 @@ export class AuthService {
         const user = {
           id: response.data.id?.toString() ?? '' ,
           username: response.data.username ?? '',
-          roles: roles
+          roles: roles,
+          isActive: response.data.isActive,
+          isVerified: response.data.isVerified
         };
 
         localStorage.setItem('currentUser', JSON.stringify(user));
@@ -103,5 +111,98 @@ export class AuthService {
         return throwError(() => new Error('Error when login'));
       })
     );
+  }
+
+  registration(registerRequest: RegisterRequest): Observable<LoginResponse> {
+    return this._httpClient.post<ResponseWrapper<LoginResponse>>(
+      `${environment.apiUrl}${this.apiUrlAuth}/signup`,
+      registerRequest,
+      {withCredentials: true}
+    ).pipe(
+      tap((response: ResponseWrapper<LoginResponse>) => {
+        if (response.data.token) {
+          localStorage.setItem('token', response.data.token);
+        }
+
+        const roles: ERole[] = (response.data.roles ?? [])
+          .map(r => r.role)
+          .filter((role) => !!role );
+
+        const user = {
+          id: response.data.id?.toString() ?? '' ,
+          username: response.data.username ?? '',
+          roles: roles,
+          isActive: response.data.isActive,
+          isVerified: response.data.isVerified
+        };
+
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        this.setCurrentUser(user);
+        this.setIsAuthenticated(true);
+      }),
+      map(response => response.data),
+      catchError(err => {
+        console.error(`Error when login : ${err}`);
+        this.setIsAuthenticated(false);
+        this.setCurrentUser(null);
+        return throwError(() => new Error('Error when login'));
+      })
+    );
+  }
+
+  logout(): Observable<void> {
+    this.isLoading = true;
+
+    // Appel optionnel au backend pour invalider le refresh token
+    const refreshToken = this.getRefreshToken();
+    let logoutRequest$: Observable<any> = of(null); // fallback si pas de backend
+
+    if (refreshToken) {
+      logoutRequest$ = this._httpClient.post<void>(
+        `${environment.apiUrl}${this.apiUrlAuth}/sign-out`,
+        { refreshToken },
+        { withCredentials: true }
+      );
+    }
+
+    return logoutRequest$.pipe(
+      tap(() => {
+        // Nettoyage côté front
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('currentUser');
+
+        this.setCurrentUser(null);
+        this.setIsAuthenticated(false);
+        this.isLoading = false;
+      }),
+      catchError(err => {
+        console.error('Erreur lors de la déconnexion', err);
+        // Même en cas d’erreur côté backend, on nettoie quand même
+        localStorage.clear()
+        this.setCurrentUser(null);
+        this.setIsAuthenticated(false);
+        this.isLoading = false;
+        return throwError(() => new Error('Erreur lors de la déconnexion'));
+      })
+    );
+  }
+
+
+  // Méthodes helpers
+  isAdmin(): boolean {
+    const user = this.currentUser$.getValue();
+    return user?.roles.includes(ERole.ADMIN) ?? false;
+  }
+
+  isRestorer(): boolean {
+    const user = this.currentUser$.getValue();
+    return user?.roles.includes(ERole.RESTORER) ?? false;
+  }
+
+  canAccessMenu(): boolean {
+    const user = this.currentUser$.getValue();
+    if (!user) return false;
+    return this.isAdmin() || (this.isRestorer() && user.isVerified);
   }
 }

@@ -3,57 +3,61 @@
 
 <div class="d-flex flex-column p-3 vh-100 menu-wrapper" >
   <h4 class="text-center mb-4">Veg'N'bio BackOffice</h4>
+  <h4 class="text-center mb-4" *ngIf="isAdmin">[Admin]</h4>
+  <h4 class="text-center mb-4" *ngIf="isRestorer">[Restaurateur]</h4>
   <ul class="list-unstyled components flex-column">
 
 
-    <li class="nav-item  mb-3">
-      <a class="nav-link" href="/dashboard">
-        <i class="bi bi-speedometer2 me-2"></i>Tableau de bord</a>
-    </li>
-
-    <li class="nav-item mb-3" *ngIf="isAdmin">
-      <a class="nav-link dropdown-toggle"  href="#user"  role="button" aria-expanded="false" > <!--data-bs-toggle="collapse"-->
-        <i class="bi bi-people me-2"></i>Utilisateurs</a>
-      <ul class="collapse ps-3 list-unstyled" id="user">
-        <li><a class="nav-link ms-2" href="/user-list">Liste</a></li>
-        <li><a class="nav-link ms-2" href="/add-user">Nouveau</a></li>
+    <li class="nav-item mb-3" *ngIf="isAdmin" >
+      <a class="nav-link "  href="#user"  role="button" aria-expanded="false" > <!-- dropdown-toggle data-bs-toggle="collapse"-->
+        <i class="bi bi-people me-2"></i><strong>Utilisateurs</strong></a>
+      <ul class="ps-3 list-unstyled" id="user"> <!-- collapse  -->
+        <li><a class="nav-link ms-2" [routerLink]="['/user-list']" >Liste</a></li>
+        <li><a class="nav-link ms-2" [routerLink]="['/status-change-list']" >Status</a></li>
       </ul>
     </li>
 
+    <li class="nav-item  mb-3" >
+      <a class="nav-link " href="#product"  role="button" aria-expanded="false" > <!--data-bs-toggle="collapse" -->
+        <i class="bi bi-file me-2"></i><strong>Produits</strong></a>
+      <ul class=" ps-3 list-unstyled" id="product" >
+        <li><a class="nav-link ms-2" [routerLink]="['/product-list']">Liste</a></li>
+      </ul>
+    </li>
+    <!--
     <li class="nav-item mb-3" *ngIf="isAdmin">
-      <a class="nav-link dropdown-toggle"   href="#products" role="button" aria-expanded="false" > <!--data-bs-toggle="collapse"-->
+      <a class="nav-link"   href="#products" role="button" aria-expanded="false" > data-bs-toggle="collapse"
         <i class="bi bi-house me-2"></i>Produits</a>
       <ul class="collapse ps-3 list-unstyled" id="products" >
         <li><a class="nav-link ms-2"  href="/product-list">Liste</a></li>
         <li><a class="nav-link ms-2"  href="/add-product">Nouveau</a></li>
+      </ul>
+    </li>-->
 
+    <li class="nav-item  mb-3"  > <!--*ngIf="isAdmin || isProfileOnly"-->
+      <a class="nav-link " href="#menu"  role="button" aria-expanded="false" > <!--data-bs-toggle="collapse" -->
+        <i class="bi bi-file me-2"></i><strong>Menus</strong></a>
+      <ul class=" ps-3 list-unstyled" id="menu" > <!--collapse-->
+        <li><a class="nav-link ms-2"  [routerLink]="['/menu-list']"> Liste</a></li>
+        <li><a class="nav-link ms-2"  [routerLink]="['/add-menu']"> Nouveau</a></li>
       </ul>
     </li>
 
-    <li class="nav-item  mb-3">
-      <a class="nav-link dropdown-toggle" data-bs-toggle="collapse" href="#menu"  role="button" aria-expanded="false" >
-        <i class="bi bi-file me-2"></i>Menu</a>
-      <ul class="collapse ps-3 list-unstyled" id="menu" >
-        <li><a class="nav-link ms-2"  href="/menu-list">Liste</a></li>
-        <li><a class="nav-link ms-2"  href="/add-menu">Nouveau</a></li>
+    <li class="nav-item  mb-3"  > <!--*ngIf="isAdmin || isProfileOnly"-->
+      <a class="nav-link " data-bs-toggle="collapse" href="#restaurant"  role="button" aria-expanded="false" > <!--dropdown-toggle-->
+        <i class="bi bi-file me-2"></i><strong>Restaurants</strong></a>
+      <ul class="ps-3 list-unstyled" id="restaurant" > <!--collapse -->
+        <li><a class="nav-link ms-2"  [routerLink]="['/canteen-list']" >Liste</a></li>
+        <li><a class="nav-link ms-2"  [routerLink]="['/add-canteen']" >Nouveau</a></li>
       </ul>
     </li>
 
-    <li class="nav-item  mb-3">
-      <a class="nav-link dropdown-toggle" data-bs-toggle="collapse" href="#restaurant"  role="button" aria-expanded="false" >
-        <i class="bi bi-file me-2"></i>Restaurant</a>
-      <ul class="collapse ps-3 list-unstyled" id="restaurant" >
-        <li><a class="nav-link ms-2"  href="/canteen-list">Liste</a></li>
-        <li><a class="nav-link ms-2"  href="/add-canteen">Nouveau</a></li>
-      </ul>
-    </li>
-
-    <li class="nav-item  mb-3">
-      <a class="nav-link dropdown-toggle" data-bs-toggle="collapse" href="#reservations" role="button" aria-expanded="false" >
-        <i class="bi bi-receipt me-2"></i>Réservations</a>
-      <ul class="collapse ps-3 list-unstyled" id="reservations" >
-        <li><a class="nav-link ms-2"  href="/booking-list">Liste</a></li>
-        <li><a class="nav-link ms-2"  href="/add-booking">Nouveau</a></li>
+    <li class="nav-item  mb-3"  > <!--*ngIf="isAdmin || isProfileOnly"-->
+      <a class="nav-link " data-bs-toggle="collapse" href="#reservations" role="button" aria-expanded="false" >
+        <i class="bi bi-receipt me-2"></i><strong>Réservations</strong></a>
+      <ul class=" ps-3 list-unstyled" id="reservations" >
+        <li><a class="nav-link ms-2"  [routerLink]="['/booking-list']">Liste</a></li>
+        <!--<li><a class="nav-link ms-2"  href="/add-booking">Nouveau</a></li>-->
       </ul>
     </li>
 
@@ -69,12 +73,12 @@
     </li>-->
 
 <!-- ADMIN et RESTORER -->
-    <li class="nav-item  mb-3">
-      <a  class="nav-link dropdown-toggle" data-bs-toggle="collapse"  href="#event"  role="button" aria-expanded="false" >
-        <i class="bi bi-tools me-2"></i>Evenements</a>
-      <ul class="collapse ps-3 list-unstyled" id="event" >
-        <li><a class="nav-link ms-2" href="#">event-list</a></li>
-        <li><a class="nav-link ms-2" href="/add-event">Nouveau</a></li>
+    <li class="nav-item  mb-3"> <!-- *ngIf="isAdmin || isProfileOnly"-->
+      <a  class="nav-link " data-bs-toggle="collapse"  href="#event"  role="button" aria-expanded="false" >
+        <i class="bi bi-tools me-2"></i><strong>Evenements</strong></a>
+      <ul class=" ps-3 list-unstyled" id="event" >
+        <li><a class="nav-link ms-2" [routerLink]="['/event-list']">Liste</a></li>
+        <li><a class="nav-link ms-2" [routerLink]="['/add-event']">Nouveau</a></li>
       </ul>
     </li>
 
@@ -82,41 +86,22 @@
 
 
 <!--Restorer-->
-
-
-    <li class="nav-item mb-3">
+    <!--<li class="nav-item mb-3">
       <a class="nav-link dropdown-toggle" data-bs-toggle="collapse" href="#pageSubmenu"  role="button" aria-expanded="false" >
         <i class="bi bi-people me-2"></i>Restaurant</a>
       <ul class="collapse ps-3 list-unstyled" id="pageSubmenu">
         <li><a class="nav-link ms-2" href="">Nouveau</a></li>
         <li><a class="nav-link ms-2" href="">Liste</a></li>
       </ul>
-    </li>
+    </li>-->
     <!---->
-    <li class="nav-item  mb-3">
-      <a class="nav-link dropdown-toggle"   href="#propertySubmenu" role="button" aria-expanded="false" >
-        <i class="bi bi-house me-2"></i>Menus</a>
-      <ul class="collapse ps-3 list-unstyled" id="propertySubmenu" >
-        <li><a class="nav-link ms-2"  href="">Nouveau</a></li>
-        <li><a class="nav-link ms-2"  href="">Liste</a></li>
-      </ul>
-    </li>
-    <!---->
-    <li class="nav-item  mb-3">
-      <a class="nav-link dropdown-toggle" data-bs-toggle="collapse" href="#docSubmenu"  role="button" aria-expanded="false" >
-        <i class="bi bi-file me-2"></i>Commandes</a>
-      <ul class="collapse ps-3 list-unstyled" id="docSubmenu" >
-        <li><a class="nav-link ms-2"  href="#">Nouveau</a></li>
+    <li class="nav-item  mb-3"  > <!--*ngIf="isAdmin || isProfileOnly"-->
+      <a class="nav-link " data-bs-toggle="collapse" href="#order"  role="button" aria-expanded="false" > <!--class="nav-link dropdown-toggle" data-bs-toggle="collapse" -->
+        <i class="bi bi-file me-2"></i><strong>Commandes</strong></a>
+      <ul class="ps-3 list-unstyled" id="order" > <!--collapse -->
+        <!--<li><a class="nav-link ms-2"  href="#">Nouveau</a></li>
         <li><a class="nav-link ms-2"  href="#">Gestion de menu</a></li>
-        <li><a class="nav-link ms-2"  href="#">Liste des restos</a></li>
-      </ul>
-    </li>
-    <!---->
-    <li class="nav-item  mb-3">
-      <a class="nav-link dropdown-toggle" data-bs-toggle="collapse" href="#billSubmenu" role="button" aria-expanded="false" >
-        <i class="bi bi-receipt me-2"></i>Réservations</a>
-      <ul class="collapse ps-3 list-unstyled" id="billSubmenu" >
-        <li><a class="nav-link ms-2"  href="#">Liste</a></li>
+        <li><a class="nav-link ms-2"  href="#">Liste des restos</a></li>-->
       </ul>
     </li>
     <!---->
@@ -134,15 +119,13 @@
 
     <!-- ADMIN et RESTORER -->
     <li class="nav-item  mb-3">
-      <a  class="nav-link dropdown-toggle" data-bs-toggle="collapse" href="#profile"  aria-expanded="false" >
-        <i class="bi bi-person me-2"></i>Profil</a>
-      <ul class="collapse ps-3 list-unstyled" id="profile">
-        <li><a class="nav-link ms-2"   href="/profile">Mes infos</a></li>
-        <li><a class="nav-link ms-2"   href="/status-change">Changer de status</a></li>
+      <a  class="nav-link " href="#profile"  aria-expanded="false" > <!--class="nav-link dropdown-toggle" data-bs-toggle="collapse" -->
+        <i class="bi bi-person me-2"></i><strong>Profil</strong></a>
+      <ul class="ps-3 list-unstyled" id="profile"> <!--collapse -->
+        <!--<li><a class="nav-link ms-2"  [routerLink]="['/profile']">Mes infos</a></li>-->
+        <li><a class="nav-link ms-2"  [routerLink]="['/status']" *ngIf="!isAdmin" >Changer de status</a></li> <!--*ngIf="isRestorer"-->
       </ul>
     </li>
-
-
   </ul>
   <hr>
 </div>

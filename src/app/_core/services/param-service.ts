@@ -1,7 +1,16 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable, shareReplay} from 'rxjs';
 import {SelectItem} from '../dto/selectItem';
+import {ResponseWrapper} from '../dto/responseWrapper';
+
+
+
+export interface SelectCanteen {
+  id: string;
+  name: string;
+}
+
 
 
 @Injectable({
@@ -18,6 +27,12 @@ export class ParamService {
   private productCategories$?: Observable<SelectItem[]>;
   private reservationTypes$?: Observable<SelectItem[]>;
   private approvalStatuses$?: Observable<SelectItem[]>;
+  private cities$?: Observable<SelectItem[]>;
+  private menuItemType$?: Observable<SelectItem[]>;
+  private menuIngredients$?: Observable<SelectItem[]>;
+  private foodTypes$?: Observable<SelectItem[]>;
+
+  private apiCanteenUrl = "http://localhost:8082/api/canteen/";
 
   constructor(private http: HttpClient) {}
 
@@ -37,7 +52,6 @@ export class ParamService {
       );
     }
     return this.eventTypes$
-
   }
 
   getAllergens(): Observable<SelectItem[]>{
@@ -90,5 +104,49 @@ export class ParamService {
 
   }
 
+  getCities(): Observable<SelectItem[]> {
+    if(!this.cities$){
+      this.cities$ = this.http.get<SelectItem[]>('assets/data/cities.json').pipe(
+        shareReplay(1)
+      );
+    }
+    return this.cities$;
+  }
+
+  getCanteens(): Observable<ResponseWrapper<SelectCanteen[]>> {
+    return this.http.get<ResponseWrapper<SelectCanteen[]>>('http://localhost:8082/api/canteen/');
+  }
+
+  getOwnCanteensApproved(): Observable<ResponseWrapper<SelectCanteen[]>> {
+    return this.http.get<ResponseWrapper<SelectCanteen[]>>('http://localhost:8082/api/canteen/me/approved');
+  }
+
+  getMenuItemType(): Observable<SelectItem[]> {
+    if(!this.menuItemType$){
+      this.menuItemType$ = this.http.get<SelectItem[]>('assets/data/menu-item-types.json').pipe(
+        shareReplay(1)
+      );
+    }
+    return this.menuItemType$;
+  }
+
+
+  getIngredientsOfMenu(): Observable<SelectItem[]> {
+    if(!this.menuIngredients$){
+      this.menuIngredients$ = this.http.get<SelectItem[]>('assets/data/ingredients.json').pipe(
+        shareReplay(1)
+      );
+    }
+    return this.menuIngredients$;
+  }
+
+  getFoodTypes(): Observable<SelectItem[]> {
+    if(!this.foodTypes$){
+      this.foodTypes$ = this.http.get<SelectItem[]>('assets/data/food-types.json').pipe(
+        shareReplay(1)
+      );
+    }
+    return this.foodTypes$;
+  }
 
 }

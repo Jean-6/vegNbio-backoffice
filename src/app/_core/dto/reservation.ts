@@ -23,17 +23,17 @@ export interface roomReservation{
 
 
 
-export class ReservationFilter {
+export class BookingFilter {
 
-  id?: string ;
+
   name?: string ;
-  canteenName?: string ;
   startDate?: Date ;
   endDate?: Date ;
-  date?: string ;
-  hour?: string ;
   type?: string ;
-  seats?: number ;
-  status?: string ; // Pending - confirmed - cancelled -  finished
+  //date?: string ;
+  //canteenName?: string ;
+  //  id?: string ;
+  //seats?: number ;
+  //status?: string ; // Pending - confirmed - cancelled -  finished
 }
 

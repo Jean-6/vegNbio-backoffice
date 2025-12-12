@@ -1,4 +1,12 @@
-import {Role} from './Role';
+
+import {Role} from './role';
+
+
+export interface LoginRequest {
+  username?: string;
+  password?: string;
+}
+
 
 
 export interface LoginResponse {
