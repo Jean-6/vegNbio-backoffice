@@ -123,7 +123,7 @@
 
       <div class="container-fluid py-4">
         <div class="card border-0 shadow rounded-3">
-          <div class="card-body  p-sm-2" style="max-height: 65vh; overflow-y:auto">
+          <div class="card-body  p-sm-2" style="max-height: 60vh; overflow-y:auto">
 
             <div class="row d-flex justify-content-start mt-3">
               @if (isLoading) {
@@ -354,7 +354,7 @@
             <p-button (click)="closeDialog()" icon="pi pi-times" label="Fermer" severity="secondary"
                       size="small"/>
 
-            <p-button (click)="deleteCanteen(selectedCanteen)" icon="pi pi-trash" label="Supprimer" severity="danger"
+            <p-button (click)="deleteCanteen(selectedCanteen)" *ngIf="selectedCanteen?.approval?.status===Status.PENDING" icon="pi pi-trash" label="Supprimer" severity="danger"
                       size="small"></p-button>
           </div>
         </ng-template>

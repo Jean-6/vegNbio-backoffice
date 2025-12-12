@@ -45,6 +45,7 @@ export interface Canteen {
 
 
 
+/*
 export interface CanteenFilter {
   name?: string ;
   cities?: string[] ;
@@ -54,7 +55,7 @@ export interface CanteenFilter {
   //endOpeningHour?: Date;
   //restorer?: string ;
   status?: string[] ;
-}
+}*/
 
 
 export interface CanteenInfo {
@@ -83,3 +84,5 @@ export interface AddCanteen{
   tags: string[];
   userId: string;
 }
+
+
