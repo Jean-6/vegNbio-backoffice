@@ -8,7 +8,6 @@ import {MessageService} from 'primeng/api';
 import {HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
 import {ToastModule} from 'primeng/toast';
 import {provideAnimations} from '@angular/platform-browser/animations';
-import {provideAnimationsAsync} from '@angular/platform-browser/animations/async';
 import {registerLocaleData} from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 import {JwtInterceptor} from './_core/interceptors/jwt-interceptor';
@@ -22,7 +21,6 @@ export const appConfig: ApplicationConfig = {
       provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor,multi: true
     },
     provideAnimations(),
-    provideAnimationsAsync(),
     provideHttpClient(withInterceptorsFromDi()),
     MessageService,
     ToastModule,
